@@ -17,6 +17,10 @@ gem "bcrypt", "~> 3.1.7"
 gem "jwt"
 gem "pundit"
 
+# Formatador
+gem "ruby-lsp"
+gem "rubocop"
+
 # GraphQL
 gem "graphql"
 gem "graphql-batch"
