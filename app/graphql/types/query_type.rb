@@ -18,6 +18,13 @@ module Types
       ids.map { |id| context.schema.object_from_id(id, context) }
     end
 
+    # Authentication queries
+    field :current_user, UserType, null: true, description: "Returns the currently authenticated user"
+
+    def current_user
+      context[:current_user]
+    end
+
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 

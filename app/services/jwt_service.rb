@@ -9,7 +9,18 @@ class JwtService
   def self.decode(token)
     body = JWT.decode(token, SECRET_KEY)[0]
     HashWithIndifferentAccess.new(body)
-  rescue JWT::DecodeError
+  rescue JWT::ExpiredSignature
+    Rails.logger.info "JWT token has expired"
     nil
+  rescue JWT::InvalidSignature
+    Rails.logger.warn "JWT token has invalid signature"
+    nil
+  rescue JWT::DecodeError => e
+    Rails.logger.warn "JWT decode error: #{e.message}"
+    nil
+  end
+
+  def self.valid_token?(token)
+    decode(token).present?
   end
 end

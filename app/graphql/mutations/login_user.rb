@@ -22,7 +22,7 @@ module Mutations
           auth_payload: {
             token: nil,
             user: nil,
-            errors: ["Senha ou email inválidos!"]
+            errors: ["Email ou senha inválidos!"]
           }
         }
       end
