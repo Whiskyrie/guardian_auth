@@ -25,19 +25,15 @@ module Mutations
       if user.save
         token = JwtService.encode(user_id: user.id)
         {
-          auth_payload: {
-            token: token,
-            user: user,
-            errors: []
-          }
+          token: token,
+          user: user,
+          errors: []
         }
       else
         {
-          auth_payload: {
-            token: nil,
-            user: nil,
-            errors: user.errors.full_messages
-          }
+          token: nil,
+          user: nil,
+          errors: user.errors.full_messages
         }
       end
     rescue StandardError => e

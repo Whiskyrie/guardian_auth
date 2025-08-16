@@ -18,19 +18,15 @@ module Mutations
       if user&.authenticate(password)
         token = JwtService.encode(user_id: user.id)
         {
-          auth_payload: {
-            token: token,
-            user: user,
-            errors: []
-          }
+          token: token,
+          user: user,
+          errors: []
         }
       else
         {
-          auth_payload: {
-            token: nil,
-            user: nil,
-            errors: ["Email ou senha inválidos!"]
-          }
+          token: nil,
+          user: nil,
+          errors: ["Email ou senha inválidos!"]
         }
       end
     rescue StandardError => e
