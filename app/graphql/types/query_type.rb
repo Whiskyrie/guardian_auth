@@ -21,9 +21,12 @@ module Types
     end
 
     # Authentication queries
-    field :current_user, UserType, null: true, description: "Returns the currently authenticated user"
+    field :current_user, UserType, null: true, description: "Returns the currently authenticated user" do
+      description "Returns the currently authenticated user based on JWT token in Authorization header"
+    end
 
     def current_user
+      # Returns the user from JWT token or nil if not authenticated
       context[:current_user]
     end
 
