@@ -2,6 +2,7 @@
 
 class GraphqlController < ApplicationController
   include Authentication
+  include Authorization
 
   # If accessing from outside this domain, nullify the session
   # This allows for outside API access while preventing CSRF attacks,
@@ -14,7 +15,8 @@ class GraphqlController < ApplicationController
     operation_name = params[:operationName]
     context = {
       current_user: current_user_from_token,
-      request: request
+      request: request,
+      pundit: pundit_user
     }
     result = GuardianAuthSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
     render json: result

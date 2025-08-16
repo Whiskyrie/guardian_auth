@@ -7,6 +7,19 @@ class User < ApplicationRecord
 
   before_validation :set_default_role, on: :create
 
+  # Role helper methods
+  def admin?
+    role == 'admin'
+  end
+
+  def user?
+    role == 'user'
+  end
+
+  def full_name
+    "#{first_name} #{last_name}".strip
+  end
+
   private
 
   def set_default_role
