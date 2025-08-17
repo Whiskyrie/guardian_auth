@@ -9,11 +9,9 @@ module AuthorizationHelper
     current_user = context[:current_user]
     policy = Pundit.policy(current_user, record)
     query ||= :index?
-    
-    unless policy.public_send(query)
-      raise GraphQL::ExecutionError, 'Not authorized'
-    end
-    
+
+    raise GraphQL::ExecutionError, 'Not authorized' unless policy.public_send(query)
+
     policy
   end
 

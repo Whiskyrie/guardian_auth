@@ -8,11 +8,9 @@ module Authorization
   def authorize_graphql(record, query = nil)
     policy = Pundit.policy(current_user_from_token, record)
     query ||= action_name.to_sym
-    
-    unless policy.public_send(query)
-      raise GraphQL::ExecutionError, 'Not authorized'
-    end
-    
+
+    raise GraphQL::ExecutionError, 'Not authorized' unless policy.public_send(query)
+
     policy
   end
 

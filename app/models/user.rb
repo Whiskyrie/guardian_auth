@@ -3,39 +3,39 @@ class User < ApplicationRecord
 
   # Constants
   VALID_ROLES = %w[user admin].freeze
-  EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/i.freeze
-  PASSWORD_REGEX = /\A(?=.*[a-zA-Z])(?=.*\d).{8,}\z/.freeze
+  EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
+  PASSWORD_REGEX = /\A(?=.*[a-zA-Z])(?=.*\d).{8,}\z/
 
   # Validations
-  validates :email, 
-            presence: true, 
+  validates :email,
+            presence: true,
             uniqueness: { case_sensitive: false },
-            format: { 
+            format: {
               with: EMAIL_REGEX,
-              message: "deve ter um formato válido"
+              message: 'deve ter um formato válido'
             },
             length: { maximum: 255 }
 
-  validates :password, 
-            length: { minimum: 8, maximum: 128 }, 
-            format: { 
-              with: PASSWORD_REGEX, 
-              message: "deve conter pelo menos 8 caracteres, incluindo letras e números" 
+  validates :password,
+            length: { minimum: 8, maximum: 128 },
+            format: {
+              with: PASSWORD_REGEX,
+              message: 'deve conter pelo menos 8 caracteres, incluindo letras e números'
             },
             if: -> { new_record? || !password.nil? }
 
-  validates :first_name, :last_name, 
-            presence: true, 
+  validates :first_name, :last_name,
+            presence: true,
             length: { minimum: 2, maximum: 50 },
-            format: { 
+            format: {
               with: /\A[a-zA-ZÀ-ÿ\s'-]+\z/,
-              message: "deve conter apenas letras, espaços, hífens e apostrofes"
+              message: 'deve conter apenas letras, espaços, hífens e apostrofes'
             }
 
   validates :role, inclusion: { in: VALID_ROLES }
 
   # Callbacks
-  before_validation :normalize_email, on: [:create, :update]
+  before_validation :normalize_email, on: %i[create update]
   before_validation :set_default_role, on: :create
 
   # Scopes
@@ -105,6 +105,6 @@ class User < ApplicationRecord
   end
 
   def set_default_role
-    self.role ||= "user"
+    self.role ||= 'user'
   end
 end

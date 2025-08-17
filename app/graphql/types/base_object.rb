@@ -19,7 +19,7 @@ module Types
     # Helper method to require authentication
     def authenticate!
       return true if authenticated?
-      
+
       raise GraphQL::ExecutionError, 'Authentication required. Please provide a valid token.'
     end
   end

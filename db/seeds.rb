@@ -9,11 +9,11 @@
 #   end
 
 # Usuários de desenvolvimento
-puts "Criando usuários de desenvolvimento..."
+puts 'Criando usuários de desenvolvimento...'
 
 admin = User.find_or_create_by!(email: 'admin@guardian.com') do |u|
   u.first_name = 'Admin'
-  u.last_name = 'Guardian' 
+  u.last_name = 'Guardian'
   u.password = '123456789'
   u.role = 'admin'
 end
@@ -22,7 +22,7 @@ puts "Admin criado: #{admin.email}"
 user = User.find_or_create_by!(email: 'user@guardian.com') do |u|
   u.first_name = 'User'
   u.last_name = 'Guardian'
-  u.password = '123456789' 
+  u.password = '123456789'
   u.role = 'user'
 end
 puts "Usuário criado: #{user.email}"
@@ -36,8 +36,8 @@ test_user = User.find_or_create_by!(email: 'teste@email.com') do |u|
 end
 puts "Usuário de teste criado: #{test_user.email}"
 
-puts "Seeds executados com sucesso!"
-puts "Usuários disponíveis para teste:"
-puts "- admin@guardian.com / senha: 123456789"
-puts "- user@guardian.com / senha: 123456789"  
-puts "- teste@email.com / senha: teste"
+puts 'Seeds executados com sucesso!'
+puts 'Usuários disponíveis para teste:'
+puts '- admin@guardian.com / senha: 123456789'
+puts '- user@guardian.com / senha: 123456789'
+puts '- teste@email.com / senha: teste'

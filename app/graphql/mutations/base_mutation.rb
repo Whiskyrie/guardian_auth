@@ -3,7 +3,7 @@
 module Mutations
   class BaseMutation < GraphQL::Schema::RelayClassicMutation
     include AuthorizationHelper
-    
+
     argument_class Types::BaseArgument
     field_class Types::BaseField
     input_object_class Types::BaseInputObject
@@ -22,7 +22,7 @@ module Mutations
     # Helper method to require authentication
     def authenticate!
       return true if authenticated?
-      
+
       raise GraphQL::ExecutionError, 'Authentication required. Please provide a valid token.'
     end
   end
