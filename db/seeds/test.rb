@@ -1,7 +1,7 @@
 # Seeds específicos para ambiente de teste
 # Mantém dados mínimos e previsíveis para testes automatizados
 
-puts "🧪 Carregando seeds de teste..."
+puts "Carregando seeds de teste..."
 
 # Admin de teste
 admin = User.find_or_create_by!(email: 'admin@test.com') do |u|
@@ -10,7 +10,7 @@ admin = User.find_or_create_by!(email: 'admin@test.com') do |u|
   u.password = 'Test123456'
   u.role = 'admin'
 end
-puts "✅ Admin de teste criado: #{admin.email}"
+puts "Admin de teste criado: #{admin.email}"
 
 # Usuário padrão de teste
 user = User.find_or_create_by!(email: 'user@test.com') do |u|
@@ -19,7 +19,7 @@ user = User.find_or_create_by!(email: 'user@test.com') do |u|
   u.password = 'Test123456'
   u.role = 'user'
 end
-puts "✅ Usuário de teste criado: #{user.email}"
+puts "Usuário de teste criado: #{user.email}"
 
 # Usuário para testes específicos de validação
 validation_user = User.find_or_create_by!(email: 'validation@test.com') do |u|
@@ -28,7 +28,7 @@ validation_user = User.find_or_create_by!(email: 'validation@test.com') do |u|
   u.password = 'Valid123456'
   u.role = 'user'
 end
-puts "✅ Usuário de validação criado: #{validation_user.email}"
+puts "Usuário de validação criado: #{validation_user.email}"
 
-puts "🎉 Seeds de teste carregados com sucesso!"
-puts "📊 Total de usuários: #{User.count}"
+puts "Seeds de teste carregados com sucesso!"
+puts "Total de usuários: #{User.count}"

@@ -1,7 +1,7 @@
 # Seeds específicos para desenvolvimento
 # Carrega dados realistas para facilitar desenvolvimento e testes manuais
 
-puts "🌱 Carregando seeds de desenvolvimento..."
+puts "Carregando seeds de desenvolvimento..."
 
 # Admin principal
 admin = User.find_or_create_by!(email: 'admin@guardian.com') do |u|
@@ -10,7 +10,7 @@ admin = User.find_or_create_by!(email: 'admin@guardian.com') do |u|
   u.password = 'Admin123456'
   u.role = 'admin'
 end
-puts "✅ Admin criado: #{admin.email} (#{admin.role})"
+puts "Admin criado: #{admin.email} (#{admin.role})"
 
 # Usuários de teste com dados variados
 test_users_data = [
@@ -65,7 +65,7 @@ test_users_data.each do |user_data|
     u.password = 'User123456'
     u.role = user_data[:role]
   end
-  puts "✅ Usuário criado: #{user.email} (#{user.role})"
+  puts "Usuário criado: #{user.email} (#{user.role})"
 end
 
 # Usuário de demonstração com nome mais realista
@@ -75,9 +75,9 @@ demo_user = User.find_or_create_by!(email: 'demo@guardian.com') do |u|
   u.password = 'Demo123456'
   u.role = 'user'
 end
-puts "✅ Usuário demo criado: #{demo_user.email} (#{demo_user.role})"
+puts "Usuário demo criado: #{demo_user.email} (#{demo_user.role})"
 
-puts "🎉 Seeds de desenvolvimento carregados com sucesso!"
-puts "📊 Total de usuários: #{User.count}"
-puts "👑 Admins: #{User.admins.count}"
-puts "👤 Usuários: #{User.users.count}"
+puts "Seeds de desenvolvimento carregados com sucesso!"
+puts "Total de usuários: #{User.count}"
+puts "Admins: #{User.admins.count}"
+puts "Usuários: #{User.users.count}"

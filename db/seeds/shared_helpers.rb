@@ -3,11 +3,11 @@
 module SeedHelpers
   # Método para verificar se um usuário já existe e foi atualizado
   def self.log_user_creation(user, action = 'criado')
-    status = user.persisted? ? '✅' : '❌'
+    status = user.persisted? ? 'OK' : 'ERRO'
     puts "#{status} Usuário #{action}: #{user.email} (#{user.role})"
     
     if user.errors.any?
-      puts "  ⚠️  Erros: #{user.errors.full_messages.join(', ')}"
+      puts "  AVISO: Erros: #{user.errors.full_messages.join(', ')}"
     end
   end
 
@@ -55,12 +55,12 @@ module SeedHelpers
 
   # Estatísticas do banco
   def self.print_statistics
-    puts "\n📊 Estatísticas atuais:"
+    puts "\nEstatísticas atuais:"
     puts "   Total de usuários: #{User.count}"
-    puts "   👑 Admins: #{User.admins.count}"
-    puts "   👤 Usuários: #{User.users.count}"
-    puts "   🕒 Nunca logaram: #{User.inactive.count}"
-    puts "   ✅ Já logaram: #{User.active.count}"
+    puts "   Admins: #{User.admins.count}"
+    puts "   Usuários: #{User.users.count}"
+    puts "   Nunca logaram: #{User.inactive.count}"
+    puts "   Já logaram: #{User.active.count}"
   end
 
   # Valida se todos os usuários são válidos
@@ -68,14 +68,14 @@ module SeedHelpers
     invalid_users = User.all.reject(&:valid?)
     
     if invalid_users.any?
-      puts "\n❌ Usuários inválidos encontrados:"
+      puts "\nUsuários inválidos encontrados:"
       invalid_users.each do |user|
         puts "   #{user.email}: #{user.errors.full_messages.join(', ')}"
       end
       return false
     end
     
-    puts "\n✅ Todos os usuários são válidos!"
+    puts "\nTodos os usuários são válidos!"
     true
   end
 end

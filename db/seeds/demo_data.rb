@@ -1,7 +1,7 @@
 # Seeds para dados de demonstração mais complexos
 # Carrega apenas em desenvolvimento quando solicitado
 
-puts "🎭 Carregando dados de demonstração avançados..."
+puts "Carregando dados de demonstração avançados..."
 
 # Cria usuários com dados mais realistas usando Faker se disponível
 require 'securerandom'
@@ -26,7 +26,7 @@ last_names = %w[
   Monteiro Campos Reis Cavalcanti Duarte Machado Nogueira Lopes Teixeira Mendes
 ]
 
-puts "👥 Criando #{DEMO_USERS_COUNT} usuários de demonstração..."
+puts "Criando #{DEMO_USERS_COUNT} usuários de demonstração..."
 
 DEMO_USERS_COUNT.times do |i|
   first_name = first_names.sample
@@ -48,7 +48,7 @@ DEMO_USERS_COUNT.times do |i|
   print "." if (i + 1) % 10 == 0
 end
 
-puts "\n👑 Criando #{DEMO_ADMINS_COUNT} admins de demonstração..."
+puts "\nCriando #{DEMO_ADMINS_COUNT} admins de demonstração..."
 
 DEMO_ADMINS_COUNT.times do |i|
   first_name = first_names.sample
@@ -65,7 +65,7 @@ DEMO_ADMINS_COUNT.times do |i|
   # Admins fazem login mais frequentemente
   admin.update!(last_login_at: rand(7.days).seconds.ago)
   
-  puts "✅ Admin demo criado: #{admin.email}"
+  puts "Admin demo criado: #{admin.email}"
 end
 
 # Simula alguns usuários desativados (para testes futuros)
@@ -75,7 +75,7 @@ inactive_emails = %w[
   suspendido@exemplo.com
 ]
 
-puts "\n😴 Criando usuários inativos para testes..."
+puts "\nCriando usuários inativos para testes..."
 
 inactive_emails.each do |email|
   user = User.find_or_create_by!(email: email) do |u|
@@ -85,18 +85,18 @@ inactive_emails.each do |email|
     u.role = 'user'
   end
   # Não define last_login_at para manter como "nunca logou"
-  puts "✅ Usuário inativo criado: #{user.email}"
+  puts "Usuário inativo criado: #{user.email}"
 end
 
-puts "\n🎉 Dados de demonstração carregados!"
-puts "📊 Estatísticas finais:"
+puts "\nDados de demonstração carregados!"
+puts "Estatísticas finais:"
 puts "   Total geral: #{User.count} usuários"
-puts "   👤 Usuários comuns: #{User.users.count}"
-puts "   👑 Administradores: #{User.admins.count}"
-puts "   ✅ Já fizeram login: #{User.active.count}"
-puts "   😴 Nunca logaram: #{User.inactive.count}"
+puts "   Usuários comuns: #{User.users.count}"
+puts "   Administradores: #{User.admins.count}"
+puts "   Já fizeram login: #{User.active.count}"
+puts "   Nunca logaram: #{User.inactive.count}"
 
-puts "\n💡 Para acessar os dados de demo:"
+puts "\nPara acessar os dados de demo:"
 puts "   - Usuários: demo1@exemplo.com até demo#{DEMO_USERS_COUNT}@exemplo.com"
 puts "   - Admins: admin-demo1@exemplo.com até admin-demo#{DEMO_ADMINS_COUNT}@exemplo.com"
 puts "   - Inativos: inativo1@exemplo.com, inativo2@exemplo.com, suspendido@exemplo.com"
