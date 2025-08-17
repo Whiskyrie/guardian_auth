@@ -52,6 +52,36 @@ Uma API de autenticação robusta construída com Ruby on Rails 8, GraphQL e JWT
    rails db:seed
    ```
 
+## 🌱 Seeds e Dados de Teste
+
+O projeto inclui um sistema robusto de seeds que cria dados específicos por ambiente:
+
+### Usuários Padrão (Desenvolvimento)
+
+**Admins:**
+- `admin@guardian.com` / senha: `Admin123456`
+- `admin2@test.com` / senha: `User123456`
+- `admin3@test.com` / senha: `User123456`
+
+**Usuários:**
+- `demo@guardian.com` / senha: `Demo123456`
+- `user1@test.com` até `user5@test.com` / senha: `User123456`
+
+### Comandos dos Seeds
+
+```bash
+# Executar seeds (idempotente)
+rails db:seed
+
+# Recriar banco com seeds
+rails db:setup
+
+# Reset completo do banco
+rails db:reset
+```
+
+Para mais informações sobre seeds, consulte [db/seeds/README.md](db/seeds/README.md).
+
 4. **Configure as variáveis de ambiente**
    ```bash
    cp .env.example .env

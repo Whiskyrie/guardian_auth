@@ -1,0 +1,57 @@
+#!/usr/bin/env ruby
+# Script para reset completo do banco de dados com seeds
+# Uso: ruby bin/db_reset ou bin/rails runner bin/db_reset
+
+puts "🔄 Iniciando reset completo do banco de dados..."
+puts "🗄️  Ambiente atual: #{Rails.env}"
+
+# Confirma se é ambiente de desenvolvimento
+unless Rails.env.development?
+  puts "❌ Este script só pode ser executado em ambiente de desenvolvimento!"
+  puts "   Ambiente atual: #{Rails.env}"
+  exit 1
+end
+
+# Confirma a ação
+print "⚠️  Tem certeza que deseja APAGAR todos os dados? (digite 'sim'): "
+confirmation = gets.chomp.downcase
+
+unless confirmation == 'sim'
+  puts "❌ Operação cancelada."
+  exit 0
+end
+
+puts "\n🗑️  Removendo todos os dados..."
+
+begin
+  # Desabilita as constraints temporariamente para permitir limpeza
+  ActiveRecord::Base.connection.disable_referential_integrity do
+    # Lista todas as tabelas exceto as de sistema
+    tables = ActiveRecord::Base.connection.tables - %w[
+      schema_migrations 
+      ar_internal_metadata
+      active_storage_blobs
+      active_storage_attachments
+      active_storage_variant_records
+    ]
+    
+    tables.each do |table|
+      ActiveRecord::Base.connection.execute("DELETE FROM #{table}")
+      puts "🧹 Tabela #{table} limpa"
+    end
+  end
+
+  puts "\n🌱 Executando seeds..."
+  
+  # Carrega seeds
+  Rails.application.load_seed
+  
+  puts "\n✅ Reset completo finalizado!"
+  puts "🎉 Banco de dados recreado com dados de desenvolvimento"
+  
+rescue => e
+  puts "\n❌ Erro durante o reset:"
+  puts "   #{e.message}"
+  puts "   Tente executar: bin/rails db:reset"
+  exit 1
+end

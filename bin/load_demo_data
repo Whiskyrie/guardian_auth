@@ -1,0 +1,45 @@
+#!/usr/bin/env ruby
+# Script para carregar dados de demonstração
+# Uso: bin/load_demo_data
+
+require_relative '../config/environment'
+
+puts "🎭 Carregador de Dados de Demonstração"
+puts "=====================================\n"
+
+# Verifica ambiente
+unless Rails.env.development?
+  puts "❌ Este script só funciona em desenvolvimento!"
+  puts "   Ambiente atual: #{Rails.env}"
+  exit 1
+end
+
+# Mostra estado atual
+current_count = User.count
+puts "📊 Estado atual: #{current_count} usuários no banco\n"
+
+# Confirma se deve carregar dados demo
+if current_count > 20
+  print "⚠️  Já existem muitos usuários (#{current_count}). Carregar dados demo mesmo assim? (s/N): "
+  confirmation = gets.chomp.downcase
+  
+  unless %w[s sim y yes].include?(confirmation)
+    puts "❌ Operação cancelada."
+    exit 0
+  end
+end
+
+puts "🌱 Carregando dados de demonstração...\n"
+
+begin
+  # Carrega o arquivo de demo data
+  load Rails.root.join('db', 'seeds', 'demo_data.rb')
+  
+  puts "\n✅ Dados de demonstração carregados com sucesso!"
+  
+rescue => e
+  puts "\n❌ Erro ao carregar dados de demonstração:"
+  puts "   #{e.message}"
+  puts "   #{e.backtrace.first}"
+  exit 1
+end
