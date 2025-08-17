@@ -32,12 +32,10 @@ module Types
     end
 
     # Admin-only queries
-    field :users, [UserType], null: true, description: 'List all users (admin only)'
-
-    def users
-      authorize!(User, :index?)
-      User.all
-    end
+    field :users, resolver: Resolvers::UsersResolver,
+          max_page_size: 50,        # Limita este campo específico
+          default_page_size: 10,    # Padrão menor para este campo
+          description: 'List all users with filters and pagination (admin only)'
 
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
