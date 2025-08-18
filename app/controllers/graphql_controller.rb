@@ -27,6 +27,14 @@ class GraphqlController < ApplicationController
       pundit: pundit_user
     }
     result = GuardianAuthSchema.execute(query, variables: variables, context: context, operation_name: operation_name)
+    
+    # Add rate limit headers if present in context
+    if context[:rate_limit_headers]
+      context[:rate_limit_headers].each do |header, value|
+        response.headers[header] = value
+      end
+    end
+    
     render json: result
   rescue StandardError => e
     raise e unless Rails.env.development?

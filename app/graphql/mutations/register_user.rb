@@ -1,6 +1,9 @@
 module Mutations
   class RegisterUser < BaseMutation
+    include RateLimitMutation
+    
     description 'Register a new user account'
+    rate_limited 'registerUser'
 
     argument :email, String, required: true, description: "User's email address"
     argument :password, String, required: true, description: "User's password (minimum 6 characters)"

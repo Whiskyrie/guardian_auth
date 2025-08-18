@@ -1,6 +1,9 @@
 module Mutations
   class LoginUser < BaseMutation
+    include RateLimitMutation
+    
     description 'Authenticate user and return access token'
+    rate_limited 'loginUser'
 
     argument :email, String, required: true, description: "User's email address"
     argument :password, String, required: true, description: "User's password"
