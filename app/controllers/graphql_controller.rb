@@ -13,8 +13,16 @@ class GraphqlController < ApplicationController
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
+    
+    # Extract token for context (better reliability)
+    token = extract_token_from_header
+    current_user = current_user_from_token
+    
+    Rails.logger.info "GraphQL Context - Token: #{token ? 'present' : 'nil'}, User: #{current_user ? 'present' : 'nil'}"
+    
     context = {
-      current_user: current_user_from_token,
+      current_user: current_user,
+      current_token: token,
       request: request,
       pundit: pundit_user
     }
