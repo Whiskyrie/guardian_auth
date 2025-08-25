@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_18_033300) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_25_031017) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -36,9 +36,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_18_033300) do
     t.datetime "updated_at", null: false
     t.datetime "last_login_at"
     t.datetime "tokens_valid_after"
+    t.datetime "profile_updated_at"
     t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["last_login_at"], name: "index_users_on_last_login_at"
+    t.index ["profile_updated_at"], name: "index_users_on_profile_updated_at"
     t.index ["role"], name: "index_users_on_role"
   end
 

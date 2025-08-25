@@ -75,6 +75,15 @@ class User < ApplicationRecord
     last_login_at.present? && last_login_at > time_frame.ago
   end
 
+  # Profile update tracking
+  def can_update_profile?
+    admin? || profile_updated_at.nil? || profile_updated_at <= 7.days.ago
+  end
+
+  def track_profile_update!
+    update_column(:profile_updated_at, Time.current)
+  end
+
   # Status helpers
   def active?
     persisted? && !deactivated?
