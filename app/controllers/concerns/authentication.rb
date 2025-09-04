@@ -33,9 +33,25 @@ module Authentication
       return nil if token_issued_at && token_issued_at < user.tokens_valid_after
     end
 
+    # Log successful authentication for security monitoring
+    SecurityLogger.log_login_attempt(
+      email: user.email,
+      ip: request.remote_ip,
+      user_agent: request.user_agent,
+      success: true
+    )
+
     user
   rescue StandardError => e
     Rails.logger.warn "Authentication error: #{e.message}"
+    
+    # Log failed authentication attempt
+    SecurityLogger.log_suspicious_activity(
+      ip: request.remote_ip,
+      activity: 'invalid_token_authentication',
+      details: { error: e.message, user_agent: request.user_agent }
+    )
+    
     nil
   end
 

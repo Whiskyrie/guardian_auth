@@ -17,6 +17,14 @@ gem 'bcrypt', '~> 3.1.7'
 gem 'jwt'
 gem 'pundit'
 
+# Security & Rate Limiting
+gem 'rack-attack'
+
+# Redis & Performance
+gem 'redis', '~> 5.0'
+gem 'connection_pool'
+gem 'hiredis-client'
+
 # Formatador
 gem 'rubocop'
 gem 'ruby-lsp'

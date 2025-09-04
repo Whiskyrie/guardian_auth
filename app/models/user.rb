@@ -4,7 +4,15 @@ class User < ApplicationRecord
   # Constants
   VALID_ROLES = %w[user admin].freeze
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
-  PASSWORD_REGEX = /\A(?=.*[a-zA-Z])(?=.*\d).{8,}\z/
+  
+  # Strong password requirements: min 8 chars, at least one uppercase, lowercase, digit, and special char
+  PASSWORD_REGEX = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}\z/
+  
+  # Common weak passwords to reject
+  WEAK_PASSWORDS = %w[
+    password 12345678 password123 admin123 qwerty123 letmein123
+    welcome123 password1 123456789 qwertyuiop adminadmin useruser
+  ].freeze
 
   # Validations
   validates :email,
@@ -20,7 +28,11 @@ class User < ApplicationRecord
             length: { minimum: 8, maximum: 128 },
             format: {
               with: PASSWORD_REGEX,
-              message: 'deve conter pelo menos 8 caracteres, incluindo letras e números'
+              message: 'deve conter pelo menos 8 caracteres, incluindo pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&)'
+            },
+            exclusion: {
+              in: WEAK_PASSWORDS,
+              message: 'é muito comum e fácil de adivinhar. Escolha uma senha mais segura.'
             },
             if: -> { new_record? || !password.nil? }
 
@@ -34,9 +46,13 @@ class User < ApplicationRecord
 
   validates :role, inclusion: { in: VALID_ROLES }
 
+  # Custom validation for password strength
+  validate :password_not_similar_to_user_info, if: -> { password.present? }
+
   # Callbacks
   before_validation :normalize_email, on: %i[create update]
   before_validation :set_default_role, on: :create
+  before_save :sanitize_user_inputs
 
   # Scopes
   scope :admins, -> { where(role: 'admin') }
@@ -115,5 +131,52 @@ class User < ApplicationRecord
 
   def set_default_role
     self.role ||= 'user'
+  end
+
+  def sanitize_user_inputs
+    # Remove potential XSS and injection attempts
+    self.first_name = sanitize_input(first_name)
+    self.last_name = sanitize_input(last_name)
+    self.email = sanitize_email(email)
+  end
+
+  def sanitize_input(input)
+    return nil if input.blank?
+    
+    # Remove HTML tags, scripts, and dangerous characters
+    sanitized = input.to_s.strip
+    sanitized = sanitized.gsub(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/mi, '')
+    sanitized = sanitized.gsub(/<[^>]*>/, '')
+    sanitized = sanitized.gsub(/[<>]/, '')
+    sanitized = sanitized.squeeze(' ')
+    
+    sanitized
+  end
+
+  def sanitize_email(email)
+    return nil if email.blank?
+    
+    # Basic email sanitization
+    sanitized = email.to_s.downcase.strip
+    sanitized = sanitized.gsub(/[<>]/, '')
+    
+    sanitized
+  end
+
+  def password_not_similar_to_user_info
+    return unless password.present?
+
+    # Check if password contains user information
+    user_info = [first_name, last_name, email&.split('@')&.first].compact.map(&:downcase)
+    password_downcase = password.downcase
+
+    user_info.each do |info|
+      next if info.length < 3
+      
+      if password_downcase.include?(info)
+        errors.add(:password, 'não deve conter informações pessoais como nome ou email')
+        break
+      end
+    end
   end
 end

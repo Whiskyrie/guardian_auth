@@ -1,8 +1,12 @@
 # frozen_string_literal: true
 
-# Rate limiting configuration for GraphQL mutations
+# Rate limiting configuration for legacy middleware (deprecated)
+# This file is kept for reference but functionality has been moved to Rack::Attack
+# See config/initializers/rack_attack.rb for current rate limiting configuration
+
 Rails.application.configure do
-  # Rate limit configuration for authentication mutations
+  # Legacy configuration - now handled by Rack::Attack
+  # Keeping for migration reference
   config.rate_limits = {
     'loginUser' => { 
       limit: 5, 
@@ -21,6 +25,10 @@ Rails.application.configure do
     }
   }.freeze
 
-  # Optional: IP whitelist for admin/testing purposes
-  # config.rate_limit_whitelist = ['127.0.0.1', '::1'].freeze
+  # IP whitelist for admin/testing purposes
+  config.rate_limit_whitelist = [
+    '127.0.0.1', 
+    '::1',
+    ENV['ADMIN_IP']
+  ].compact.freeze
 end
