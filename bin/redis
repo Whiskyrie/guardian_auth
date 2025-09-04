@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+# Redis management script for GuardianAuth
+
+set -e
+
+COMPOSE_FILE="docker-compose.redis.yml"
+
+show_help() {
+    echo "Redis management script for GuardianAuth"
+    echo ""
+    echo "Usage: bin/redis [COMMAND]"
+    echo ""
+    echo "Commands:"
+    echo "  start    Start Redis container"
+    echo "  stop     Stop Redis container"
+    echo "  restart  Restart Redis container"
+    echo "  status   Show Redis container status"
+    echo "  logs     Show Redis logs"
+    echo "  cli      Connect to Redis CLI"
+    echo "  test     Test Redis connection"
+    echo "  clean    Stop and remove Redis container and volumes"
+    echo "  help     Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  bin/redis start"
+    echo "  bin/redis cli"
+    echo "  bin/redis test"
+}
+
+start_redis() {
+    echo "🚀 Starting Redis..."
+    docker compose -f $COMPOSE_FILE up -d
+    echo "✅ Redis started successfully!"
+    echo "📊 Redis is available at: localhost:6379"
+}
+
+stop_redis() {
+    echo "🛑 Stopping Redis..."
+    docker compose -f $COMPOSE_FILE down
+    echo "✅ Redis stopped successfully!"
+}
+
+restart_redis() {
+    echo "🔄 Restarting Redis..."
+    docker compose -f $COMPOSE_FILE restart
+    echo "✅ Redis restarted successfully!"
+}
+
+status_redis() {
+    echo "📊 Redis Status:"
+    docker compose -f $COMPOSE_FILE ps
+}
+
+logs_redis() {
+    echo "📋 Redis Logs:"
+    docker compose -f $COMPOSE_FILE logs -f redis
+}
+
+cli_redis() {
+    echo "🔗 Connecting to Redis CLI..."
+    echo "Type 'exit' to leave the CLI"
+    docker exec -it guardian_auth-redis-1 redis-cli
+}
+
+test_redis() {
+    echo "🧪 Testing Redis connection..."
+    
+    # Test basic ping
+    echo -n "Testing ping: "
+    if docker exec guardian_auth-redis-1 redis-cli ping | grep -q "PONG"; then
+        echo "✅ PONG"
+    else
+        echo "❌ Failed"
+        return 1
+    fi
+    
+    # Test write/read
+    echo -n "Testing write/read: "
+    docker exec guardian_auth-redis-1 redis-cli set test_key "test_value" > /dev/null
+    if docker exec guardian_auth-redis-1 redis-cli get test_key | grep -q "test_value"; then
+        echo "✅ OK"
+        docker exec guardian_auth-redis-1 redis-cli del test_key > /dev/null
+    else
+        echo "❌ Failed"
+        return 1
+    fi
+    
+    # Test databases
+    echo "Testing databases:"
+    for db in 0 1 2; do
+        echo -n "  DB $db: "
+        if docker exec guardian_auth-redis-1 redis-cli -n $db ping | grep -q "PONG"; then
+            echo "✅ OK"
+        else
+            echo "❌ Failed"
+        fi
+    done
+    
+    echo ""
+    echo "🎉 All Redis tests passed!"
+}
+
+clean_redis() {
+    echo "🧹 Cleaning Redis (this will remove all data)..."
+    read -p "Are you sure? This will delete all Redis data [y/N]: " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        docker compose -f $COMPOSE_FILE down -v
+        echo "✅ Redis cleaned successfully!"
+    else
+        echo "❌ Cancelled"
+    fi
+}
+
+# Main script logic
+case "${1:-help}" in
+    start)
+        start_redis
+        ;;
+    stop)
+        stop_redis
+        ;;
+    restart)
+        restart_redis
+        ;;
+    status)
+        status_redis
+        ;;
+    logs)
+        logs_redis
+        ;;
+    cli)
+        cli_redis
+        ;;
+    test)
+        test_redis
+        ;;
+    clean)
+        clean_redis
+        ;;
+    help|--help|-h)
+        show_help
+        ;;
+    *)
+        echo "❌ Unknown command: $1"
+        echo ""
+        show_help
+        exit 1
+        ;;
+esac
