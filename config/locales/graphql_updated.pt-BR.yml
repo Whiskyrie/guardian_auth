@@ -1,0 +1,32 @@
+pt-BR:
+  graphql:
+    errors:
+      authentication:
+        required: "Autenticação obrigatória"
+        invalid_token: "Token inválido ou malformado"
+        token_expired: "Token expirado"
+        invalid_credentials: "Email ou senha inválidos"
+      authorization:
+        unauthorized: "Você não está autorizado a executar esta ação"
+        insufficient_permissions: "Permissões insuficientes para acessar este recurso"
+      validation:
+        failed: "Falha na validação"
+        invalid_input: "Entrada inválida fornecida"
+        missing_field: "Campo obrigatório está ausente"
+      resource:
+        not_found: "Recurso não encontrado"
+        already_exists: "Recurso já existe"
+        user_not_found: "Usuário não encontrado"
+        conflict: "Conflito de recurso"
+        email_exists: "Endereço de email já existe"
+      rate_limit:
+        exceeded: "Limite de taxa excedido. Tente novamente mais tarde"
+      business:
+        rule_violation: "Violação de regra de negócio"
+        profile_update_too_frequent: "O perfil só pode ser atualizado uma vez a cada 7 dias"
+      server:
+        internal: "Erro interno do servidor"
+        database: "Erro de banco de dados ocorreu"
+        external_service: "Serviço externo indisponível"
+        service_unavailable: "Serviço temporariamente indisponível"
+        timeout: "Tempo limite da solicitação esgotado"

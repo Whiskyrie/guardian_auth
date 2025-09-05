@@ -1,0 +1,32 @@
+en:
+  graphql:
+    errors:
+      authentication:
+        required: "Authentication required"
+        invalid_token: "Invalid or malformed token"
+        token_expired: "Token has expired"
+        invalid_credentials: "Invalid email or password"
+      authorization:
+        unauthorized: "You are not authorized to perform this action"
+        insufficient_permissions: "Insufficient permissions to access this resource"
+      validation:
+        failed: "Validation failed"
+        invalid_input: "Invalid input provided"
+        missing_field: "Required field is missing"
+      resource:
+        not_found: "Resource not found"
+        already_exists: "Resource already exists"
+        user_not_found: "User not found"
+        conflict: "Resource conflict"
+        email_exists: "Email address already exists"
+      rate_limit:
+        exceeded: "Rate limit exceeded. Please try again later"
+      business:
+        rule_violation: "Business rule violation"
+        profile_update_too_frequent: "Profile can only be updated once every 7 days"
+      server:
+        internal: "Internal server error"
+        database: "Database error occurred"
+        external_service: "External service unavailable"
+        service_unavailable: "Service temporarily unavailable"
+        timeout: "Request timed out"
