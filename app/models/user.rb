@@ -2,6 +2,7 @@ class User < ApplicationRecord
   has_secure_password
 
   # Constants
+  # Legacy constant - keeping for backwards compatibility
   VALID_ROLES = %w[user admin].freeze
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
   
@@ -13,6 +14,12 @@ class User < ApplicationRecord
     password 12345678 password123 admin123 qwerty123 letmein123
     welcome123 password1 123456789 qwertyuiop adminadmin useruser
   ].freeze
+
+  # RBAC Associations
+  has_many :user_roles, dependent: :destroy
+  has_many :roles, through: :user_roles
+  has_many :permissions, through: :roles
+  has_many :granted_roles, class_name: 'UserRole', foreign_key: 'granted_by_id', dependent: :nullify
 
   # Validations
   validates :email,
@@ -44,30 +51,96 @@ class User < ApplicationRecord
               message: 'deve conter apenas letras, espaços, hífens e apostrofes'
             }
 
-  validates :role, inclusion: { in: VALID_ROLES }
+  # Removed old role validation - now using RBAC system
+  # validates :role, inclusion: { in: VALID_ROLES }
 
   # Custom validation for password strength
   validate :password_not_similar_to_user_info, if: -> { password.present? }
 
   # Callbacks
   before_validation :normalize_email, on: %i[create update]
-  before_validation :set_default_role, on: :create
+  after_create :assign_default_role
   before_save :sanitize_user_inputs
 
   # Scopes
-  scope :admins, -> { where(role: 'admin') }
-  scope :users, -> { where(role: 'user') }
+  # Legacy scopes - converted to use RBAC
+  scope :admins, -> { joins(:roles).where(roles: { name: 'admin' }) }
+  scope :users, -> { joins(:roles).where(roles: { name: 'user' }) }
   scope :recent, -> { order(created_at: :desc) }
   scope :active, -> { where.not(last_login_at: nil) }
   scope :inactive, -> { where(last_login_at: nil) }
 
-  # Role helper methods
+  # Role helper methods (maintaining compatibility)
   def admin?
-    role == 'admin'
+    # Use new RBAC system only
+    has_role?('admin')
   end
 
   def user?
-    role == 'user'
+    # Use new RBAC system only
+    has_role?('user')
+  end
+
+  # RBAC Methods
+  def has_role?(role_name)
+    return false unless persisted?
+    roles.exists?(name: role_name)
+  end
+
+  def has_permission?(resource, action)
+    return false unless persisted?
+    
+    # Check through roles and permissions
+    permissions.exists?(resource: resource, action: action)
+  end
+
+  def can?(permission_string, object = nil)
+    return false unless persisted?
+    
+    resource, action = permission_string.split(':', 2)
+    return false if resource.blank? || action.blank?
+    
+    # Handle self permissions
+    case permission_string
+    when 'users:read_own', 'users:update_own'
+      return object == self if object.is_a?(User)
+    when 'self:anyone'
+      return true
+    end
+    
+    # Check RBAC permissions
+    has_permission?(resource, action)
+  end
+
+  def assign_role(role_name, granted_by: nil)
+    role_obj = Role.find_by(name: role_name)
+    return false unless role_obj
+    
+    user_roles.find_or_create_by(role: role_obj) do |ur|
+      ur.granted_by = granted_by
+      ur.granted_at = Time.current
+    end
+    
+    true
+  end
+
+  def remove_role(role_name)
+    user_roles.joins(:role).where(roles: { name: role_name }).destroy_all
+  end
+
+  def role_names
+    roles.pluck(:name)
+  end
+
+  def permission_names
+    permissions.pluck(:resource, :action).map { |r, a| "#{r}:#{a}" }
+  end
+
+  def primary_role
+    # Return the highest privilege role
+    return 'admin' if has_role?('admin')
+    return 'user' if has_role?('user')
+    role_names.first || 'user'
   end
 
   def full_name
@@ -129,8 +202,14 @@ class User < ApplicationRecord
     self.email = email.downcase.strip if email.present?
   end
 
-  def set_default_role
-    self.role ||= 'user'
+  def assign_default_role
+    # Assign default 'user' role if no roles are assigned
+    if roles.empty?
+      default_role = Role.find_by(name: 'user')
+      if default_role
+        user_roles.create!(role: default_role, granted_at: Time.current)
+      end
+    end
   end
 
   def sanitize_user_inputs
