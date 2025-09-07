@@ -11,5 +11,7 @@ module Types
     field :update_user, mutation: Mutations::UpdateUser
     field :update_user_by_email, mutation: Mutations::UpdateUserByEmail
     field :update_my_profile, mutation: Mutations::UpdateMyProfile
+    field :delete_user, mutation: Mutations::DeleteUser
+    field :update_user_role, mutation: Mutations::UpdateUserRole
   end
 end

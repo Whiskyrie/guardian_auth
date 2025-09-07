@@ -30,8 +30,10 @@ class UserPolicy < ApplicationPolicy
     def resolve
       if user&.admin?
         scope.all
-      else
+      elsif user
         scope.where(id: user.id)
+      else
+        scope.none
       end
     end
   end

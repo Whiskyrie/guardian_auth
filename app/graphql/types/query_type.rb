@@ -37,6 +37,18 @@ module Types
           default_page_size: 10,    # Padrão menor para este campo
           description: 'List all users with filters and pagination (admin only)'
 
+    field :user, UserType, null: true, description: 'Find a specific user by ID (admin only)' do
+      argument :id, ID, required: true, description: 'The ID of the user to find'
+    end
+
+    def user(id:)
+      user_record = User.find_by(id: id)
+      return nil unless user_record
+
+      authorize!(user_record, :show?)
+      user_record
+    end
+
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
