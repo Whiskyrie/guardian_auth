@@ -1,4 +1,5 @@
 class User < ApplicationRecord
+  include Auditable
   has_secure_password
 
   # Constants
@@ -257,5 +258,26 @@ class User < ApplicationRecord
         break
       end
     end
+  end
+
+  # Override audit methods for User model
+  def audit_action_for(action)
+    case action
+    when :create then 'register'
+    when :update then 'user_update'
+    when :destroy then 'user_deletion'
+    else action.to_s
+    end
+  end
+
+  def should_audit?
+    # Always audit user actions for security
+    true
+  end
+
+  def audit_user
+    # For user operations, try to get current user from thread
+    # If no current user (like in tests), use self for updates/deletions
+    Thread.current[:current_user] || (defined?(Current) && Current&.user) || (persisted? ? self : nil)
   end
 end

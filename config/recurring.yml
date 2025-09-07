@@ -17,6 +17,10 @@ production:
     class: CleanupExpiredTokensJob
     queue: low_priority
     schedule: every day at 2am
+  cleanup_old_audit_logs:
+    class: CleanupOldAuditLogsJob
+    queue: low_priority
+    schedule: every day at 3am
 
 development:
   cleanup_expired_tokens:

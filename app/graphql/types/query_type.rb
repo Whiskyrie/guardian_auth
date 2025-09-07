@@ -41,13 +41,11 @@ module Types
       argument :id, ID, required: true, description: 'The ID of the user to find'
     end
 
-    def user(id:)
-      user_record = User.find_by(id: id)
-      return nil unless user_record
-
-      authorize!(user_record, :show?)
-      user_record
-    end
+    # Audit logs (admin only)
+    field :audit_logs, resolver: Resolvers::AuditLogsResolver,
+          max_page_size: 100,       # Allow larger page size for audit logs
+          default_page_size: 20,     # Default page size for audit logs
+          description: 'Query audit logs for security monitoring (admin only)'
 
     # Add root-level fields here.
     # They will be entry points for queries on your schema.

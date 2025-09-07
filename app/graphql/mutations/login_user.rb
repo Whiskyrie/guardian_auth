@@ -46,11 +46,12 @@ module Mutations
         )
         
         # Log successful login
-        SecurityLogger.log_login_attempt(
+        AuditLogger.log_login(
           email: email,
           ip: context[:request]&.remote_ip,
           user_agent: context[:request]&.user_agent,
-          success: true
+          success: true,
+          user: user
         )
         
         {
@@ -62,11 +63,12 @@ module Mutations
         # Log failed login attempt with specific reason
         failure_reason = user ? 'invalid_password' : 'user_not_found'
         
-        SecurityLogger.log_login_attempt(
+        AuditLogger.log_login(
           email: email,
           ip: context[:request]&.remote_ip,
           user_agent: context[:request]&.user_agent,
           success: false,
+          user: user,
           failure_reason: failure_reason
         )
         
@@ -81,14 +83,17 @@ module Mutations
       Rails.logger.error "LoginUser mutation error: #{e.message}"
       
       # Log security incident
-      SecurityLogger.log_suspicious_activity(
-        ip: context[:request]&.remote_ip,
-        activity: 'login_mutation_error',
-        details: { 
+      AuditLogger.log(
+        action: 'login_error',
+        resource: 'User',
+        metadata: {
+          ip_address: context[:request]&.remote_ip,
+          user_agent: context[:request]&.user_agent,
           error: e.message,
           email: email,
-          user_agent: context[:request]&.user_agent
-        }
+          activity: 'login_mutation_error'
+        },
+        result: 'failure'
       )
       
       {

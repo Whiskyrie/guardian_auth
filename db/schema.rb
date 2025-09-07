@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_05_171055) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_07_035242) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "audit_logs", force: :cascade do |t|
+    t.bigint "user_id"
+    t.string "action", null: false, comment: "login, logout, register, etc"
+    t.string "resource", null: false, comment: "User, Token, etc"
+    t.string "resource_id"
+    t.json "metadata", comment: "IP, user_agent, changes, request_id"
+    t.string "result", null: false, comment: "success, failure, blocked"
+    t.datetime "created_at", null: false
+    t.index ["action", "created_at"], name: "index_audit_logs_on_action_and_created_at"
+    t.index ["resource", "resource_id"], name: "index_audit_logs_on_resource_and_resource_id"
+    t.index ["result", "created_at"], name: "index_audit_logs_on_result_and_created_at"
+    t.index ["user_id", "created_at"], name: "index_audit_logs_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_audit_logs_on_user_id"
+    t.check_constraint "action IS NOT NULL", name: "audit_action_not_null"
+    t.check_constraint "resource IS NOT NULL", name: "audit_resource_not_null"
+    t.check_constraint "result::text = ANY (ARRAY['success'::character varying, 'failure'::character varying, 'blocked'::character varying]::text[])", name: "valid_audit_result"
+  end
 
   create_table "permissions", force: :cascade do |t|
     t.string "resource", null: false
@@ -87,6 +105,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_05_171055) do
     t.index ["role"], name: "index_users_on_role"
   end
 
+  add_foreign_key "audit_logs", "users", on_delete: :nullify
   add_foreign_key "role_permissions", "permissions"
   add_foreign_key "role_permissions", "roles"
   add_foreign_key "token_blacklists", "users"

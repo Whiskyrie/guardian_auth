@@ -41,7 +41,6 @@ module Mutations
         }
       end
     rescue StandardError => e
-      Rails.logger.error "ChangePassword mutation error: #{e.message}"
       {
         user: nil,
         errors: ['Password change failed. Please try again.']
