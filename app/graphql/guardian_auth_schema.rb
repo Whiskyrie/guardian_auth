@@ -3,8 +3,12 @@
 require_relative 'errors/base_error'
 require_relative 'errors/error_codes'
 require_relative 'middleware/logging_middleware'
+require_relative 'tracers/performance_tracer'
+require_relative 'analyzers/query_complexity_analyzer'
 
 class GuardianAuthSchema < GraphQL::Schema
+  description "Guardian Auth API - Sistema de autenticação e autorização com JWT e GraphQL"
+
   mutation(Types::MutationType)
   query(Types::QueryType)
 
@@ -15,19 +19,27 @@ class GuardianAuthSchema < GraphQL::Schema
   default_max_page_size 100  # Máximo 100 por página
   default_page_size 25       # Padrão 25 por página
 
-  # Configurar limites de segurança
-  max_depth 15
-  max_complexity 300
+  # Configurar limites de segurança aprimorados
+  max_depth 10               # Reduzido para melhor segurança
+  max_complexity 200         # Reduzido para melhor performance
+  max_query_string_tokens(5000)
+  validate_max_errors(100)
 
-  # Add query analyzers for security
+  # Configurar introspection baseado no ambiente
+  if Rails.env.production?
+    disable_introspection_entry_points
+    introspection false
+  else
+    introspection true
+  end
+
+  # Add query analyzers for security and performance
   query_analyzer(GraphQL::Analysis::AST::MaxQueryDepth)
   query_analyzer(GraphQL::Analysis::AST::MaxQueryComplexity)
+  query_analyzer(Analyzers::QueryComplexityAnalyzer)
 
   # Configure error handling with detailed logging and user-friendly messages
   use GraphQL::Backtrace
-
-  # Add logging tracer for GraphQL operations (usando a nova sintaxe)
-  trace_with GraphQL::LoggingTracer
 
   # Rescue from specific exceptions
   rescue_from(ActiveRecord::RecordNotFound) do |err, obj, args, ctx, field|

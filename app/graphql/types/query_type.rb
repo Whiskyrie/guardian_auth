@@ -2,10 +2,15 @@
 
 module Types
   class QueryType < Types::BaseObject
+    description "Ponto de entrada para todas as consultas no sistema Guardian Auth"
+    
     include AuthorizationHelper
 
-    field :node, Types::NodeType, null: true, description: 'Fetches an object given its ID.' do
-      argument :id, ID, required: true, description: 'ID of the object.'
+    # Relay Node interface
+    field :node, Types::NodeType, null: true, 
+          description: 'Busca um objeto pelo seu ID global único (Global ID)' do
+      argument :id, ID, required: true, 
+               description: 'ID global único do objeto a ser buscado'
     end
 
     def node(id:)
@@ -13,8 +18,9 @@ module Types
     end
 
     field :nodes, [Types::NodeType, { null: true }], null: true,
-                                                     description: 'Fetches a list of objects given a list of IDs.' do
-      argument :ids, [ID], required: true, description: 'IDs of the objects.'
+          description: 'Busca uma lista de objetos pelos seus IDs globais únicos' do
+      argument :ids, [ID], required: true, 
+               description: 'Lista de IDs globais únicos dos objetos a serem buscados'
     end
 
     def nodes(ids:)
@@ -22,8 +28,9 @@ module Types
     end
 
     # Authentication queries
-    field :current_user, UserType, null: true, description: 'Returns the currently authenticated user' do
-      description 'Returns the currently authenticated user based on JWT token in Authorization header'
+    field :current_user, UserType, null: true, 
+          description: 'Retorna o usuário atualmente autenticado baseado no token JWT' do
+      description 'Obtém informações do usuário logado através do token JWT no header Authorization'
     end
 
     def current_user
@@ -35,24 +42,25 @@ module Types
     field :users, resolver: Resolvers::UsersResolver,
           max_page_size: 50,        # Limita este campo específico
           default_page_size: 10,    # Padrão menor para este campo
-          description: 'List all users with filters and pagination (admin only)'
+          description: 'Lista todos os usuários com filtros e paginação (apenas administradores)'
 
-    field :user, UserType, null: true, description: 'Find a specific user by ID (admin only)' do
-      argument :id, ID, required: true, description: 'The ID of the user to find'
+    field :user, UserType, null: true, 
+          description: 'Busca um usuário específico pelo ID (apenas administradores)' do
+      argument :id, ID, required: true, 
+               description: 'O ID do usuário a ser buscado'
     end
 
     # Audit logs (admin only)
     field :audit_logs, resolver: Resolvers::AuditLogsResolver,
           max_page_size: 100,       # Allow larger page size for audit logs
           default_page_size: 20,     # Default page size for audit logs
-          description: 'Query audit logs for security monitoring (admin only)'
+          description: 'Consulta logs de auditoria para monitoramento de segurança (apenas administradores)'
 
-    # Add root-level fields here.
-    # They will be entry points for queries on your schema.
-
-    # TODO: remove me
+    # Health check and system info
     field :test_field, String, null: false,
-                               description: 'An example field added by the generator'
+          description: 'Campo de teste para verificar conectividade da API',
+          deprecation_reason: "Este campo será removido em versões futuras. Use health checks específicos."
+    
     def test_field
       'Hello World!'
     end

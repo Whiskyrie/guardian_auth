@@ -1,0 +1,13 @@
+{
+  "errors": [
+    {
+      "message": "Query has depth of 13, which exceeds max depth of 10"
+    },
+    {
+      "message": "Query complexity 232 exceeds maximum allowed complexity 200"
+    },
+    {
+      "message": "Query has depth of 13, which exceeds max depth of 10"
+    }
+  ]
+}
