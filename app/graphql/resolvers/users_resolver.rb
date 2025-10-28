@@ -25,7 +25,10 @@ module Resolvers
     private
     
     def apply_filters(scope, filters)
-      scope = scope.where(role: filters[:role]) if filters[:role].present?
+      # Filter by role using RBAC system
+      if filters[:role].present?
+        scope = scope.joins(:roles).where(roles: { name: filters[:role] })
+      end
       
       if filters[:search].present?
         search_term = "%#{filters[:search]}%"
