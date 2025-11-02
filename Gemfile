@@ -21,9 +21,9 @@ gem 'pundit'
 gem 'rack-attack'
 
 # Redis & Performance
-gem 'redis', '~> 5.0'
 gem 'connection_pool'
 gem 'hiredis-client'
+gem 'redis', '~> 5.0'
 
 # Formatador
 gem 'rubocop'
@@ -38,6 +38,11 @@ gem 'rack-cors'
 
 # Environment Configuration
 gem 'dotenv-rails'
+
+# Email System
+gem 'liquid'
+gem 'mail'
+gem 'premailer-rails'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: %i[windows jruby]
