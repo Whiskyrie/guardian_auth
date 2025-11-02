@@ -17,6 +17,10 @@ production:
     class: CleanupExpiredTokensJob
     queue: low_priority
     schedule: every day at 2am
+  cleanup_password_reset_tokens:
+    class: CleanupExpiredResetTokensJob
+    queue: low_priority
+    schedule: every day at 3:30am
   cleanup_old_audit_logs:
     class: CleanupOldAuditLogsJob
     queue: low_priority
@@ -27,3 +31,7 @@ development:
     class: CleanupExpiredTokensJob
     queue: low_priority
     schedule: every day at 2am
+  cleanup_password_reset_tokens:
+    class: CleanupExpiredResetTokensJob
+    queue: low_priority
+    schedule: every day at 3:30am
