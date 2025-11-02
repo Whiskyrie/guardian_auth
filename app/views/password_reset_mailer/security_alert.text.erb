@@ -1,0 +1,20 @@
+<%= @app_name %> - Alerta de Segurança
+================================
+
+Olá, <%= @user.first_name %>!
+
+Detectamos atividade suspeita na sua conta.
+
+ATIVIDADE SUSPEITA DETECTADA:
+<%= @activity[:message] || 'Múltiplas tentativas de acesso detectadas.' %>
+
+Detalhes da atividade:
+- Data/Hora: <%= @activity[:timestamp] || Time.current.strftime('%d/%m/%Y às %H:%M') %>
+- IP: <%= @activity[:ip_address] || 'Não identificado' %>
+- Localização: <%= @activity[:location] || 'Não identificada' %>
+
+Se você reconhece esta atividade, ignore este alerta.
+Caso contrário, recomendamos redefinir sua senha imediatamente.
+
+---
+Precisa de ajuda? <%= @support_email %>

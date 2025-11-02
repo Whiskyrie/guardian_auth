@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alerta de Segurança - <%= @app_name %></title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background-color: #f4f4f4; }
+    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .header { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; padding: 40px 30px; text-align: center; }
+    .header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+    .alert-icon { font-size: 48px; margin-bottom: 20px; }
+    .content { padding: 40px 30px; color: #374151; line-height: 1.6; }
+    .content h2 { margin: 0 0 20px 0; font-size: 24px; color: #111827; }
+    .content p { margin: 0 0 20px 0; font-size: 16px; }
+    .alert-box { background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 6px; padding: 16px; margin: 30px 0; }
+    .alert-box h3 { margin: 0 0 8px 0; color: #991b1b; font-size: 16px; }
+    .alert-box p { margin: 0; color: #991b1b; }
+    .footer { background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb; }
+    .footer p { margin: 0 0 10px 0; font-size: 14px; color: #6b7280; }
+    .support { color: #2563eb; text-decoration: none; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="alert-icon">⚠️</div>
+      <h1>Alerta de Segurança</h1>
+    </div>
+    <div class="content">
+      <h2>Olá, <%= @user.first_name %>!</h2>
+      <p>Detectamos atividade suspeita na sua conta do <%= @app_name %>.</p>
+      
+      <div class="alert-box">
+        <h3>🚨 Atividade Suspeita Detectada</h3>
+        <p><%= @activity[:message] || 'Múltiplas tentativas de acesso detectadas.' %></p>
+      </div>
+
+      <p>Detalhes da atividade:</p>
+      <ul>
+        <li>Data/Hora: <%= @activity[:timestamp] || Time.current.strftime('%d/%m/%Y às %H:%M') %></li>
+        <li>IP: <%= @activity[:ip_address] || 'Não identificado' %></li>
+        <li>Localização: <%= @activity[:location] || 'Não identificada' %></li>
+      </ul>
+
+      <p>Se você reconhece esta atividade, ignore este alerta. Caso contrário, recomendamos:</p>
+      <ul>
+        <li>Redefinir sua senha imediatamente</li>
+        <li>Verificar a segurança da sua conta</li>
+        <li>Entrar em contato conosco</li>
+      </ul>
+    </div>
+    <div class="footer">
+      <p>Precisa de ajuda? <a href="mailto:<%= @support_email %>" class="support"><%= @support_email %></a></p>
+    </div>
+  </div>
+</body>
+</html>
