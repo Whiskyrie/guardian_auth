@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class AuditLogType < Types::BaseObject
     description "Audit log entry for security and compliance tracking"

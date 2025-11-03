@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class JsonType < Types::BaseScalar
     description "Represents JSON data as a hash or array"

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module GraphQL
   # GraphQL tracer for comprehensive logging and error tracking
   class LoggingTracer

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Mutations
   class LogoutAllDevices < BaseMutation
     description "Logout user from all devices by invalidating all their JWT tokens"

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class BaseObject < GraphQL::Schema::Object
     description "Classe base para todos os tipos de objeto GraphQL no sistema Guardian Auth"

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 require_relative 'errors/base_error'
 require_relative 'errors/error_codes'
 require_relative 'middleware/logging_middleware'

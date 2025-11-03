@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Errors
   class BaseError < GraphQL::ExecutionError
     attr_reader :error_code, :details

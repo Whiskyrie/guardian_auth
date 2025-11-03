@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class RolePermission < ApplicationRecord
   # Associations
   belongs_to :role

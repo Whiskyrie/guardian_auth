@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class UserPolicy < ApplicationPolicy
   def show?
     # Usuário pode ver próprio perfil ou admin pode ver qualquer usuário

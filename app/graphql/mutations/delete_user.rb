@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Mutations
   class DeleteUser < GraphQL::Schema::Mutation
     include AuthorizationHelper

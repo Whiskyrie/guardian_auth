@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class QueryType < Types::BaseObject
     description "Ponto de entrada para todas as consultas no sistema Guardian Auth"

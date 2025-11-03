@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Analyzers
   class QueryComplexityAnalyzer < GraphQL::Analysis::AST::Analyzer
     def initialize(query)

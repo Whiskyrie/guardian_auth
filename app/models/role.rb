@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 class Role < ApplicationRecord
   # Associations
   has_many :role_permissions, dependent: :destroy

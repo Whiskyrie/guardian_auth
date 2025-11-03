@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Mutations
   class UpdateMyProfile < BaseMutation
     description 'Update current user profile (no ID needed)'

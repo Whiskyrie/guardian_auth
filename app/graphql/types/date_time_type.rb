@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class DateTimeType < Types::BaseScalar
     description "Represents a datetime value in ISO 8601 format"

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Mutations
   class LogoutUser < BaseMutation
     description "Logout current user by invalidating their JWT token"

@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 namespace :graphql do
   desc "Export GraphQL schema"
   task export_schema: :environment do

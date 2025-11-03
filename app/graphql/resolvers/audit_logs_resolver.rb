@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Resolvers
   class AuditLogsResolver < Resolvers::BaseResolver
     description "Query audit logs for security monitoring"

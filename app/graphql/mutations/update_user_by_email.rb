@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Mutations
   class UpdateUserByEmail < BaseMutation
     description 'Update user information by email'

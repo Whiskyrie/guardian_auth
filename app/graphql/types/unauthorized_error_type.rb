@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class UnauthorizedErrorType < Types::BaseObject
     description 'Erro de autorização quando usuário não tem permissão'

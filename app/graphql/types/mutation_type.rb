@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 module Types
   class MutationType < Types::BaseObject
     description "Ponto de entrada para todas as mutações (alterações de dados) no sistema Guardian Auth"
