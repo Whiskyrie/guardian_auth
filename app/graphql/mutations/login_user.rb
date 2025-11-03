@@ -1,7 +1,7 @@
 module Mutations
   class LoginUser < BaseMutation
     include RateLimitMutation
-    
+
     description 'Authenticate user and return access token'
     rate_limited 'loginUser'
 
@@ -15,7 +15,7 @@ module Mutations
     def resolve(email:, password:)
       # Normalize and sanitize email input
       email = email.to_s.downcase.strip
-      
+
       # Basic input validation
       if email.blank? || password.blank?
         SecurityLogger.log_login_attempt(
@@ -25,7 +25,7 @@ module Mutations
           success: false,
           failure_reason: 'empty_credentials'
         )
-        
+
         return {
           token: nil,
           user: nil,
@@ -38,13 +38,13 @@ module Mutations
       if user&.authenticate(password)
         # Update last login timestamp
         user.track_login!
-        
+
         # Generate JWT token
         token = JwtService.encode(
           user_id: user.id,
           role: user.role
         )
-        
+
         # Log successful login
         AuditLogger.log_login(
           email: email,
@@ -53,7 +53,7 @@ module Mutations
           success: true,
           user: user
         )
-        
+
         {
           token: token,
           user: user,
@@ -62,7 +62,7 @@ module Mutations
       else
         # Log failed login attempt with specific reason
         failure_reason = user ? 'invalid_password' : 'user_not_found'
-        
+
         AuditLogger.log_login(
           email: email,
           ip: context[:request]&.remote_ip,
@@ -71,7 +71,7 @@ module Mutations
           user: user,
           failure_reason: failure_reason
         )
-        
+
         # Generic error message to prevent user enumeration
         {
           token: nil,
@@ -81,7 +81,7 @@ module Mutations
       end
     rescue StandardError => e
       Rails.logger.error "LoginUser mutation error: #{e.message}"
-      
+
       # Log security incident
       AuditLogger.log(
         action: 'login_error',
@@ -95,7 +95,7 @@ module Mutations
         },
         result: 'failure'
       )
-      
+
       {
         token: nil,
         user: nil,

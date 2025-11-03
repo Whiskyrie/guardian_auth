@@ -15,7 +15,8 @@ module Types
       when DateTime, Time, Date
         input_value.to_datetime
       else
-        raise GraphQL::CoercionError, "Expected DateTime to be a String or DateTime object, but got #{input_value.class}"
+        raise GraphQL::CoercionError,
+              "Expected DateTime to be a String or DateTime object, but got #{input_value.class}"
       end
     end
 

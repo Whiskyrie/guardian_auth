@@ -15,7 +15,7 @@ class AuditLogger
       failure_reason: failure_reason,
       email: email
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:authentication][:login],
       resource: AuditLog::RESOURCES[:user],
@@ -31,7 +31,7 @@ class AuditLogger
       ip: ip,
       user_agent: user_agent
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:authentication][:logout],
       resource: AuditLog::RESOURCES[:user],
@@ -47,7 +47,7 @@ class AuditLogger
       ip: ip,
       user_agent: user_agent
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:authentication][:token_refresh],
       resource: AuditLog::RESOURCES[:token],
@@ -66,7 +66,7 @@ class AuditLogger
       failure_reason: reason,
       attempted_action: action
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:authorization][:access_denied],
       resource: resource,
@@ -82,7 +82,7 @@ class AuditLogger
       user_agent: user_agent,
       attempted_action: action
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:authorization][:permission_check],
       resource: resource,
@@ -98,7 +98,7 @@ class AuditLogger
       ip: ip,
       user_agent: user_agent
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:user_management][:register],
       resource: AuditLog::RESOURCES[:user],
@@ -115,7 +115,7 @@ class AuditLogger
       user_agent: user_agent,
       previous_values: previous_values
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:user_management][:update],
       resource: AuditLog::RESOURCES[:user],
@@ -132,7 +132,7 @@ class AuditLogger
       user_agent: user_agent,
       failure_reason: failure_reason
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:user_management][:password_change],
       resource: AuditLog::RESOURCES[:user],
@@ -152,7 +152,7 @@ class AuditLogger
       new_values: { role: new_role },
       target_user_id: target_user.id
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:admin][:role_change],
       resource: AuditLog::RESOURCES[:user],
@@ -171,7 +171,7 @@ class AuditLogger
       target_user_email: target_user.email,
       deletion_reason: reason
     )
-    
+
     instance.log(
       action: AuditLog::ACTIONS[:admin][:user_deletion],
       resource: AuditLog::RESOURCES[:user],
@@ -224,7 +224,7 @@ class AuditLogger
       user_agent: user_agent,
       timestamp: Time.current.iso8601
     }
-    
+
     metadata.merge!(additional_data)
     metadata
   end

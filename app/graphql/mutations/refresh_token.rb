@@ -1,7 +1,7 @@
 module Mutations
   class RefreshToken < GraphQL::Schema::Mutation
     include AuthorizationHelper
-    
+
     description 'Refresh an expired or soon-to-expire JWT token'
 
     argument :token, String, required: true, description: 'Current JWT token (can be expired)'
@@ -28,7 +28,7 @@ module Mutations
         Rails.logger.warn "JWT decode error: #{e.message}"
         return error_response(['Invalid token format'])
       end
-      
+
       # Verify signature separately
       begin
         JWT.decode(token, JwtService::SECRET_KEY, true, { verify_exp: false })

@@ -14,7 +14,7 @@ module Mutations
 
     def resolve(id:)
       user = User.find_by(id: id)
-      
+
       unless user
         return {
           success: false,

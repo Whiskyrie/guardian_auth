@@ -12,14 +12,14 @@ module Types
     field :result, String, null: false, description: "Result of the action (success, failure, blocked)"
     field :created_at, Types::DateTimeType, null: false, description: "When the action occurred"
     field :user, Types::UserType, null: true, description: "User who performed the action"
-    
+
     # Computed fields for easier access to metadata
     field :ip_address, String, null: true, description: "IP address from which the action originated"
     field :user_agent, String, null: true, description: "User agent string from the request"
     field :request_id, String, null: true, description: "Unique request identifier"
     field :failure_reason, String, null: true, description: "Reason for failure if applicable"
     field :previous_values, Types::JsonType, null: true, description: "Previous values before update"
-    
+
     # Authorization
     def self.authorized?(object, context)
       # Only admins can view audit logs

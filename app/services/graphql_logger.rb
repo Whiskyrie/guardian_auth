@@ -96,26 +96,26 @@ class GraphqlLogger
     }
 
     # Add backtrace for non-GraphQL errors
-    if !error.is_a?(GraphQL::ExecutionError)
+    unless error.is_a?(GraphQL::ExecutionError)
       log_data[:backtrace] = error.backtrace&.first(10)
     end
 
     @logger.error(log_data.to_json)
 
     # Also log to security logger for authentication/authorization errors
-    if security_related_error?(error)
-      SecurityLogger.log_security_event(
-        event: 'graphql_security_error',
-        user_id: context[:current_user]&.id,
-        ip: extract_ip(context),
-        user_agent: extract_user_agent(context),
-        details: {
-          error_class: error.class.name,
-          error_message: error.message,
-          error_code: extract_error_code(error)
-        }
-      )
-    end
+    return unless security_related_error?(error)
+
+    SecurityLogger.log_security_event(
+      event: 'graphql_security_error',
+      user_id: context[:current_user]&.id,
+      ip: extract_ip(context),
+      user_agent: extract_user_agent(context),
+      details: {
+        error_class: error.class.name,
+        error_message: error.message,
+        error_code: extract_error_code(error)
+      }
+    )
   end
 
   def log_authorization_failure(user:, action:, resource:, context:)
@@ -190,7 +190,7 @@ class GraphqlLogger
 
   def truncate_query(query)
     return nil unless query
-    
+
     query.length > 500 ? "#{query[0..497]}..." : query
   end
 
@@ -199,7 +199,7 @@ class GraphqlLogger
     return true if error.is_a?(Errors::AuthorizationError)
     return true if error.is_a?(Pundit::NotAuthorizedError)
     return true if error.is_a?(JWT::DecodeError)
-    
+
     false
   end
 end

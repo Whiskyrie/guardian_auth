@@ -1,6 +1,3 @@
-# frozen_string_literal: true
-
-# Configurações específicas do GraphQL
 Rails.application.configure do
   # Configurações de performance em produção
   if Rails.env.production?
@@ -14,7 +11,7 @@ if defined?(Prometheus)
   GRAPHQL_QUERY_DURATION = Prometheus::Histogram.new(
     :graphql_query_duration_seconds,
     docstring: 'GraphQL query execution time',
-    labels: [:operation_name, :operation_type]
+    labels: %i[operation_name operation_type]
   )
 
   GRAPHQL_QUERY_COMPLEXITY = Prometheus::Histogram.new(
@@ -27,7 +24,7 @@ if defined?(Prometheus)
   GRAPHQL_FIELD_DURATION = Prometheus::Histogram.new(
     :graphql_field_duration_seconds,
     docstring: 'GraphQL field execution time',
-    labels: [:field_name, :type_name]
+    labels: %i[field_name type_name]
   )
 
   # Registrar métricas

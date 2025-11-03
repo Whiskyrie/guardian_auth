@@ -15,45 +15,45 @@ puts "Admin criado: #{admin.email} (#{admin.role})"
 # Usuários de teste com dados variados
 test_users_data = [
   {
-    first_name: 'João', 
-    last_name: 'Silva', 
-    email: 'user1@test.com', 
+    first_name: 'João',
+    last_name: 'Silva',
+    email: 'user1@test.com',
     role: 'user'
   },
   {
-    first_name: 'Maria', 
-    last_name: 'Santos', 
-    email: 'user2@test.com', 
+    first_name: 'Maria',
+    last_name: 'Santos',
+    email: 'user2@test.com',
     role: 'user'
   },
   {
-    first_name: 'Pedro', 
-    last_name: 'Oliveira', 
-    email: 'user3@test.com', 
+    first_name: 'Pedro',
+    last_name: 'Oliveira',
+    email: 'user3@test.com',
     role: 'user'
   },
   {
-    first_name: 'Ana', 
-    last_name: 'Costa', 
-    email: 'user4@test.com', 
+    first_name: 'Ana',
+    last_name: 'Costa',
+    email: 'user4@test.com',
     role: 'user'
   },
   {
-    first_name: 'Carlos', 
-    last_name: 'Ferreira', 
-    email: 'user5@test.com', 
+    first_name: 'Carlos',
+    last_name: 'Ferreira',
+    email: 'user5@test.com',
     role: 'user'
   },
   {
-    first_name: 'Admin', 
-    last_name: 'Secundário', 
-    email: 'admin2@test.com', 
+    first_name: 'Admin',
+    last_name: 'Secundário',
+    email: 'admin2@test.com',
     role: 'admin'
   },
   {
-    first_name: 'Super', 
-    last_name: 'Admin', 
-    email: 'admin3@test.com', 
+    first_name: 'Super',
+    last_name: 'Admin',
+    email: 'admin3@test.com',
     role: 'admin'
   }
 ]

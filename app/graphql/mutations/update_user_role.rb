@@ -16,7 +16,7 @@ module Mutations
 
     def resolve(user_id:, role_names:)
       user = User.find_by(id: user_id)
-      
+
       unless user
         return {
           user: nil,
@@ -49,7 +49,7 @@ module Mutations
 
       # Clear existing roles and assign new ones
       user.user_roles.destroy_all
-      
+
       role_names.each do |role_name|
         user.assign_role(role_name, granted_by: current_user)
       end

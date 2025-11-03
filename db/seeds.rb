@@ -6,7 +6,7 @@
 require_relative 'seeds/shared_helpers'
 
 puts "Iniciando seeds para ambiente: #{Rails.env}"
-puts "#{Time.current.strftime('%Y-%m-%d %H:%M:%S')}"
+puts Time.current.strftime('%Y-%m-%d %H:%M:%S').to_s
 
 # Carrega seeds específicos por ambiente
 environment_seeds_file = Rails.root.join('db', 'seeds', "#{Rails.env}.rb")
@@ -17,7 +17,7 @@ if File.exist?(environment_seeds_file)
 else
   puts "Arquivo de seeds específico não encontrado: #{environment_seeds_file}"
   puts "Carregando seeds padrão..."
-  
+
   # Fallback para seeds básicos
   admin = User.find_or_create_by!(email: 'admin@guardian.com') do |u|
     u.first_name = 'Admin'

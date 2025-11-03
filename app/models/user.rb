@@ -6,10 +6,10 @@ class User < ApplicationRecord
   # Legacy constant - keeping for backwards compatibility
   VALID_ROLES = %w[user admin].freeze
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
-  
+
   # Strong password requirements: min 8 chars, at least one uppercase, lowercase, digit, and special char
   PASSWORD_REGEX = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}\z/
-  
+
   # Common weak passwords to reject
   WEAK_PASSWORDS = %w[
     password 12345678 password123 admin123 qwerty123 letmein123
@@ -85,22 +85,23 @@ class User < ApplicationRecord
   # RBAC Methods
   def has_role?(role_name)
     return false unless persisted?
+
     roles.exists?(name: role_name)
   end
 
   def has_permission?(resource, action)
     return false unless persisted?
-    
+
     # Check through roles and permissions
     permissions.exists?(resource: resource, action: action)
   end
 
   def can?(permission_string, object = nil)
     return false unless persisted?
-    
+
     resource, action = permission_string.split(':', 2)
     return false if resource.blank? || action.blank?
-    
+
     # Handle self permissions
     case permission_string
     when 'users:read_own', 'users:update_own'
@@ -108,7 +109,7 @@ class User < ApplicationRecord
     when 'self:anyone'
       return true
     end
-    
+
     # Check RBAC permissions
     has_permission?(resource, action)
   end
@@ -116,12 +117,12 @@ class User < ApplicationRecord
   def assign_role(role_name, granted_by: nil)
     role_obj = Role.find_by(name: role_name)
     return false unless role_obj
-    
+
     user_roles.find_or_create_by(role: role_obj) do |ur|
       ur.granted_by = granted_by
       ur.granted_at = Time.current
     end
-    
+
     true
   end
 
@@ -141,6 +142,7 @@ class User < ApplicationRecord
     # Return the highest privilege role
     return 'admin' if has_role?('admin')
     return 'user' if has_role?('user')
+
     role_names.first || 'user'
   end
 
@@ -222,24 +224,24 @@ class User < ApplicationRecord
 
   def sanitize_input(input)
     return nil if input.blank?
-    
+
     # Remove HTML tags, scripts, and dangerous characters
     sanitized = input.to_s.strip
-    sanitized = sanitized.gsub(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/mi, '')
+    sanitized = sanitized.gsub(%r{<script\b[^<]*(?:(?!</script>)<[^<]*)*</script>}mi, '')
     sanitized = sanitized.gsub(/<[^>]*>/, '')
     sanitized = sanitized.gsub(/[<>]/, '')
     sanitized = sanitized.squeeze(' ')
-    
+
     sanitized
   end
 
   def sanitize_email(email)
     return nil if email.blank?
-    
+
     # Basic email sanitization
     sanitized = email.to_s.downcase.strip
     sanitized = sanitized.gsub(/[<>]/, '')
-    
+
     sanitized
   end
 
@@ -252,7 +254,7 @@ class User < ApplicationRecord
 
     user_info.each do |info|
       next if info.length < 3
-      
+
       if password_downcase.include?(info)
         errors.add(:password, 'não deve conter informações pessoais como nome ou email')
         break

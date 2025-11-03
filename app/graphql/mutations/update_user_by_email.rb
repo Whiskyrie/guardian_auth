@@ -13,7 +13,7 @@ module Mutations
     def resolve(email:, input:)
       # Buscar o usuário pelo email
       user = User.find_by_email(email)
-      
+
       unless user
         return { user: nil, errors: ['User not found'] }
       end

@@ -42,12 +42,12 @@ class JwtService
 
   def self.valid_token?(token)
     return false unless decode(token).present?
-    
+
     # Check if token is blacklisted
     decoded = decode(token)
     jti = decoded&.dig('jti')
     return false if jti && blacklisted?(jti)
-    
+
     true
   end
 

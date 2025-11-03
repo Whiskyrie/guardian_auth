@@ -7,7 +7,7 @@ class RateLimiter
 
   def call(env)
     request = Rack::Request.new(env)
-    
+
     # Only apply rate limiting to GraphQL endpoint
     if request.path == '/graphql' && request.post?
       apply_rate_limiting(request, env)
@@ -21,12 +21,12 @@ class RateLimiter
   def apply_rate_limiting(request, env)
     # Parse GraphQL query to get operation name
     operation_name = extract_operation_name(request)
-    
+
     # Check if this operation should be rate limited
     if should_rate_limit?(operation_name)
       rate_limit_config = Rails.application.config.rate_limits[operation_name]
       identifier = get_identifier(request, rate_limit_config[:identifier])
-      
+
       # Check rate limit
       result = RateLimitService.check_and_increment(
         operation: operation_name,
@@ -34,15 +34,15 @@ class RateLimiter
         limit: rate_limit_config[:limit],
         window: rate_limit_config[:window]
       )
-      
+
       # Log rate limit attempts
       log_rate_limit_attempt(operation_name, identifier, result)
-      
+
       # If rate limited, return error response with headers
       unless result[:allowed]
         return rate_limit_response(result)
       end
-      
+
       # If allowed, continue with headers
       status, headers, body = @app.call(env)
       add_rate_limit_headers(headers, result)
@@ -55,10 +55,10 @@ class RateLimiter
   def extract_operation_name(request)
     body = request.body.read
     request.body.rewind
-    
+
     begin
       parsed_body = JSON.parse(body)
-      operation_name = parsed_body.dig('query')&.match(/mutation\s+(\w+)/)&.[](1)
+      operation_name = parsed_body['query']&.match(/mutation\s+(\w+)/)&.[](1)
       operation_name ||= parsed_body['operationName']
       operation_name
     rescue JSON::ParserError
@@ -76,7 +76,7 @@ class RateLimiter
       request.ip
     when :user_id
       # For user-based rate limiting, we need to extract user from token
-      # This is a simplified version - in practice you might want to 
+      # This is a simplified version - in practice you might want to
       # extract this from the Authorization header
       extract_user_id_from_request(request)
     else
@@ -100,10 +100,10 @@ class RateLimiter
   def log_rate_limit_attempt(operation_name, identifier, result)
     if result[:allowed]
       Rails.logger.info "Rate limit check passed for #{operation_name} - Identifier: #{identifier}, " \
-                       "Remaining: #{result[:remaining]}/#{result[:limit]}"
+                        "Remaining: #{result[:remaining]}/#{result[:limit]}"
     else
       Rails.logger.warn "Rate limit exceeded for #{operation_name} - Identifier: #{identifier}, " \
-                       "Limit: #{result[:limit]}, Reset at: #{result[:reset_at]}"
+                        "Limit: #{result[:limit]}, Reset at: #{result[:reset_at]}"
     end
   end
 

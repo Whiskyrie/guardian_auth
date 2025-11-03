@@ -1,8 +1,6 @@
-# frozen_string_literal: true
 
-class Rack::Attack
   # Use dedicated Redis cache store for rate limiting
-  self.cache.store = Rails.application.config.rate_limit_cache_store
+  cache.store = Rails.application.config.rate_limit_cache_store
 
   # Enable Retry-After header for better client behavior
   self.throttled_response_retry_after_header = true
@@ -66,7 +64,7 @@ class Rack::Attack
 
   # Safelist localhost and common development IPs
   safelist('allow from localhost') do |req|
-    '127.0.0.1' == req.ip || '::1' == req.ip
+    ['127.0.0.1', '::1'].include?(req.ip)
   end
 
   # Safelist authenticated admin users (if API key present)
@@ -96,7 +94,7 @@ class Rack::Attack
       '/etc/passwd', '/.env', '/config.php',
       '/xmlrpc.php', '/wp-content'
     ]
-    
+
     # Block requests with suspicious query strings
     suspicious_patterns = [
       /union.*select/i, /script.*alert/i, /javascript:/i,
@@ -105,7 +103,7 @@ class Rack::Attack
 
     path_match = suspicious_paths.any? { |path| req.path.include?(path) }
     query_match = suspicious_patterns.any? { |pattern| req.query_string.match?(pattern) }
-    
+
     path_match || query_match
   end
 
@@ -114,9 +112,9 @@ class Rack::Attack
     # Block after 3 bad requests in 10 minutes, ban for 1 hour
     Rack::Attack::Fail2Ban.filter("bad-requests-#{req.ip}", maxretry: 3, findtime: 10.minutes, bantime: 1.hour) do
       # Consider 4xx responses as bad requests (except 401, 404, 429)
-      req.env['rack.attack.match_data'] && 
-      req.env['rack.attack.match_data'][:status] &&
-      [400, 403, 422].include?(req.env['rack.attack.match_data'][:status])
+      req.env['rack.attack.match_data'] &&
+        req.env['rack.attack.match_data'][:status] &&
+        [400, 403, 422].include?(req.env['rack.attack.match_data'][:status])
     end
   end
 
@@ -127,14 +125,12 @@ class Rack::Attack
 
   # GraphQL specific throttling
   throttle('graphql requests', limit: 60, period: 1.minute) do |req|
-    if req.path == '/graphql' && req.post?
-      req.ip
-    end
+    req.ip if req.path == '/graphql' && req.post?
   end
 
   # Login attempts throttling with exponential backoff
   (1..5).each do |level|
-    throttle("login attempts level #{level}", limit: (5 * level), period: (2 ** level).minutes) do |req|
+    throttle("login attempts level #{level}", limit: (5 * level), period: (2**level).minutes) do |req|
       if req.path == '/graphql' && req.post?
         # Extract operation name from GraphQL request
         begin
@@ -143,10 +139,8 @@ class Rack::Attack
           parsed_body = JSON.parse(body)
           operation_name = parsed_body.dig('query')&.match(/mutation\s+(\w+)/)&.[](1)
           operation_name ||= parsed_body['operationName']
-          
-          if ['loginUser', 'Login', 'SignIn'].include?(operation_name)
-            req.ip
-          end
+
+          req.ip if %w[loginUser Login SignIn].include?(operation_name)
         rescue JSON::ParserError
           nil
         end
@@ -163,9 +157,9 @@ class Rack::Attack
         parsed_body = JSON.parse(body)
         operation_name = parsed_body.dig('query')&.match(/mutation\s+(\w+)/)&.[](1)
         operation_name ||= parsed_body['operationName']
-        
-        if ['loginUser', 'Login', 'SignIn'].include?(operation_name)
-          email = parsed_body.dig('variables', 'email') || 
+
+        if %w[loginUser Login SignIn].include?(operation_name)
+          email = parsed_body.dig('variables', 'email') ||
                   parsed_body.dig('variables', 'input', 'email')
           email&.downcase&.strip if email.present?
         end
@@ -187,8 +181,8 @@ class Rack::Attack
           parsed_body = JSON.parse(body)
           operation_name = parsed_body.dig('query')&.match(/mutation\s+(\w+)/)&.[](1)
           operation_name ||= parsed_body['operationName']
-          
-          ['loginUser', 'Login', 'SignIn'].include?(operation_name)
+
+          %w[loginUser Login SignIn].include?(operation_name)
         rescue JSON::ParserError
           false
         end
@@ -199,10 +193,10 @@ class Rack::Attack
   # Track special user agents for monitoring
   track('suspicious user agents') do |req|
     suspicious_agents = [
-      /bot/i, /crawl/i, /spider/i, /scan/i, 
+      /bot/i, /crawl/i, /spider/i, /scan/i,
       /curl/i, /wget/i, /python/i, /java/i
     ]
-    
+
     user_agent = req.user_agent.to_s
     suspicious_agents.any? { |pattern| user_agent.match?(pattern) }
   end
@@ -216,8 +210,8 @@ class Rack::Attack
         parsed_body = JSON.parse(body)
         operation_name = parsed_body.dig('query')&.match(/mutation\s+(\w+)/)&.[](1)
         operation_name ||= parsed_body['operationName']
-        
-        ['changePassword', 'ChangePassword', 'UpdatePassword'].include?(operation_name)
+
+        %w[changePassword ChangePassword UpdatePassword].include?(operation_name)
       rescue JSON::ParserError
         false
       end

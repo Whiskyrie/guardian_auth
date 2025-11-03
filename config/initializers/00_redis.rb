@@ -1,9 +1,3 @@
-# frozen_string_literal: true
-
-require 'connection_pool'
-require 'redis'
-
-# Redis configuration for different purposes
 # This file is loaded first (00_) to ensure Redis is available for other initializers
 Rails.application.configure do
   # Main Redis connection pool
@@ -22,7 +16,7 @@ Rails.application.configure do
   config.rate_limit_cache_store = ActiveSupport::Cache::RedisCacheStore.new(
     url: ENV.fetch('REDIS_RATE_LIMIT_URL', 'redis://localhost:6379/1'),
     pool: { size: 5, timeout: 5 },
-    error_handler: ->(method:, returning:, exception:) {
+    error_handler: lambda { |method:, returning:, exception:|
       Rails.logger.error "Redis cache error in #{method}: #{exception.message}"
     }
   )

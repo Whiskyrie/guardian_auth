@@ -8,7 +8,7 @@ module Errors
       @error_code = error_code || self.class.default_error_code
       @details = details
       @locale = locale || I18n.locale
-      
+
       final_message = message || localized_message || default_message
       super(final_message)
     end
@@ -156,9 +156,9 @@ module Errors
   class ValidationError < BaseError
     attr_reader :field_errors
 
-    def initialize(message = nil, field_errors: [], **options)
+    def initialize(message = nil, field_errors: [], **)
       @field_errors = field_errors
-      super(message, error_code: ErrorCodes::VALIDATION_FAILED, **options)
+      super(message, error_code: ErrorCodes::VALIDATION_FAILED, **)
     end
 
     def to_h

@@ -20,7 +20,7 @@ module RateLimitMutation
 
   module RateLimitingPrepend
     # Override resolve to add rate limiting
-    def resolve(*args, **kwargs)
+    def resolve(*, **)
       # Get rate limit configuration
       operation_name = self.class.rate_limit_operation
       rate_config = Rails.application.config.rate_limits[operation_name]
@@ -29,7 +29,7 @@ module RateLimitMutation
         # Check if IP is whitelisted (skip rate limiting)
         client_ip = extract_client_ip
         if whitelisted_ip?(client_ip)
-          return super(*args, **kwargs)
+          return super
         end
 
         # Get identifier based on configuration
@@ -66,7 +66,7 @@ module RateLimitMutation
       end
 
       # Proceed with normal mutation execution
-      super(*args, **kwargs)
+      super
     end
 
     private
@@ -78,7 +78,7 @@ module RateLimitMutation
       # Try various headers to get real IP
       forwarded_for = request.headers['HTTP_X_FORWARDED_FOR']
       real_ip = request.headers['HTTP_X_REAL_IP']
-      
+
       if forwarded_for.present?
         # Take the first IP in the chain (original client)
         forwarded_for.split(',').first.strip
@@ -92,7 +92,7 @@ module RateLimitMutation
     def whitelisted_ip?(ip)
       whitelist = Rails.application.config.try(:rate_limit_whitelist)
       return false unless whitelist
-      
+
       whitelist.include?(ip)
     end
 

@@ -7,10 +7,10 @@ class SecurityHeadersMiddleware
 
   def call(env)
     status, headers, response = @app.call(env)
-    
+
     # Add security headers
     headers.merge!(security_headers)
-    
+
     [status, headers, response]
   end
 
@@ -20,25 +20,25 @@ class SecurityHeadersMiddleware
     {
       # Prevent MIME type sniffing
       'X-Content-Type-Options' => 'nosniff',
-      
+
       # Prevent clickjacking
       'X-Frame-Options' => 'DENY',
-      
+
       # Enable XSS protection
       'X-XSS-Protection' => '1; mode=block',
-      
+
       # Force HTTPS in production
       'Strict-Transport-Security' => 'max-age=31536000; includeSubDomains',
-      
+
       # Control referrer information
       'Referrer-Policy' => 'strict-origin-when-cross-origin',
-      
+
       # Prevent Adobe Flash and PDF files from loading
       'X-Permitted-Cross-Domain-Policies' => 'none',
-      
+
       # Content Security Policy
       'Content-Security-Policy' => content_security_policy,
-      
+
       # Feature Policy / Permissions Policy
       'Permissions-Policy' => permissions_policy
     }

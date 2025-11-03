@@ -2,7 +2,7 @@ module Mutations
   class ChangePassword < GraphQL::Schema::Mutation
     include AuthorizationHelper
     include RateLimitMutation
-    
+
     description 'Change user password'
     rate_limited 'changePassword'
 
@@ -40,7 +40,7 @@ module Mutations
           errors: user.errors.full_messages
         }
       end
-    rescue StandardError => e
+    rescue StandardError
       {
         user: nil,
         errors: ['Password change failed. Please try again.']

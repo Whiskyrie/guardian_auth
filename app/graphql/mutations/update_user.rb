@@ -13,7 +13,7 @@ module Mutations
     def resolve(id:, input:)
       # Buscar o usuário pelo GlobalID
       user = GlobalID.find(id)
-      
+
       unless user
         return { user: nil, errors: ['User not found'] }
       end
@@ -35,13 +35,13 @@ module Mutations
         # Rastrear atualização de perfil se houve mudanças relevantes
         profile_fields = %w[email first_name last_name]
         profile_changes = update_attrs.keys.map(&:to_s) & profile_fields
-        
+
         if profile_changes.any? && !current_user&.admin?
           # Verificar se realmente houve mudanças nos valores
           has_real_changes = profile_changes.any? do |field|
             user.public_send("#{field}_previously_was") != user.public_send(field.to_sym)
           end
-          
+
           if has_real_changes
             user.track_profile_update!
           end
@@ -90,9 +90,9 @@ module Mutations
       unless user.can_update_profile?
         days_since_update = ((Time.current - user.profile_updated_at) / 1.day).floor
         days_remaining = 7 - days_since_update
-        return { 
-          user: nil, 
-          errors: ["Você só pode alterar seu perfil uma vez a cada 7 dias. Aguarde #{days_remaining} dia(s)."] 
+        return {
+          user: nil,
+          errors: ["Você só pode alterar seu perfil uma vez a cada 7 dias. Aguarde #{days_remaining} dia(s)."]
         }
       end
 

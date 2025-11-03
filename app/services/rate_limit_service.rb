@@ -4,16 +4,16 @@ class RateLimitService
   class << self
     # Check if request should be rate limited
     # @param operation [String] The mutation name (e.g., 'loginUser', 'registerUser')
-    # @param identifier [String] IP address or user ID 
+    # @param identifier [String] IP address or user ID
     # @param limit [Integer] Maximum requests allowed
     # @param window [ActiveSupport::Duration] Time window for the limit
     # @return [Hash] { allowed: Boolean, remaining: Integer, reset_at: Time }
     def check_and_increment(operation:, identifier:, limit:, window:)
       cache_key = build_cache_key(operation, identifier)
-      
+
       # Get current data from cache
       cache_data = Rails.cache.read(cache_key)
-      
+
       if cache_data.nil?
         # First request in window
         cache_data = {
@@ -21,9 +21,9 @@ class RateLimitService
           first_request_at: Time.current,
           window_end: Time.current + window
         }
-        
+
         Rails.cache.write(cache_key, cache_data, expires_in: window)
-        
+
         return {
           allowed: true,
           remaining: limit - 1,
@@ -40,9 +40,9 @@ class RateLimitService
           first_request_at: Time.current,
           window_end: Time.current + window
         }
-        
+
         Rails.cache.write(cache_key, cache_data, expires_in: window)
-        
+
         return {
           allowed: true,
           remaining: limit - 1,
@@ -55,7 +55,7 @@ class RateLimitService
       if cache_data[:count] >= limit
         # Log the blocked attempt
         Rails.logger.warn "Rate limit exceeded for #{operation} - Identifier: #{identifier}, Count: #{cache_data[:count] + 1}/#{limit}"
-        
+
         return {
           allowed: false,
           remaining: 0,

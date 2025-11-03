@@ -95,14 +95,14 @@ class GuardianAuthSchema < GraphQL::Schema
       query: ctx.query.query_string,
       context: ctx
     )
-    
+
     case err
     when JWT::ExpiredSignature
-      raise Errors::TokenExpiredError.new
+      raise Errors::TokenExpiredError
     when JWT::VerificationError
-      raise Errors::InvalidTokenError.new
+      raise Errors::InvalidTokenError
     else
-      raise Errors::InvalidTokenError.new('Invalid token format')
+      raise Errors::InvalidTokenError, 'Invalid token format'
     end
   end
 
@@ -113,9 +113,7 @@ class GuardianAuthSchema < GraphQL::Schema
       current_count: 'unknown',
       context: ctx
     )
-    raise Errors::RateLimitExceededError.new(
-      'Rate limit exceeded. Please try again later.'
-    )
+    raise Errors::RateLimitExceededError, 'Rate limit exceeded. Please try again later.'
   end
 
   rescue_from(StandardError) do |err, obj, args, ctx, field|

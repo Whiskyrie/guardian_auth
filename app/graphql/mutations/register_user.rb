@@ -1,7 +1,7 @@
 module Mutations
   class RegisterUser < BaseMutation
     include RateLimitMutation
-    
+
     description 'Register a new user account'
     rate_limited 'registerUser'
 

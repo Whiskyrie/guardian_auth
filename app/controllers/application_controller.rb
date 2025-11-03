@@ -18,7 +18,7 @@ class ApplicationController < ActionController::API
       path: request.path,
       method: request.method
     }
-    
+
     # Store current user in thread for audit logging
     Thread.current[:current_user] = current_user if respond_to?(:current_user) && current_user
   end
@@ -35,7 +35,7 @@ class ApplicationController < ActionController::API
         reason: 'insufficient_permissions'
       )
     end
-    
+
     render json: { error: 'You are not authorized to perform this action' }, status: :forbidden
   end
 end

@@ -44,14 +44,14 @@ module Authentication
     user
   rescue StandardError => e
     Rails.logger.warn "Authentication error: #{e.message}"
-    
+
     # Log failed authentication attempt
     SecurityLogger.log_suspicious_activity(
       ip: request.remote_ip,
       activity: 'invalid_token_authentication',
       details: { error: e.message, user_agent: request.user_agent }
     )
-    
+
     nil
   end
 

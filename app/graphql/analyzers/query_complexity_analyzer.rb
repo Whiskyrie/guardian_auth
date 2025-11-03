@@ -18,15 +18,15 @@ module Analyzers
       @complexity += field_complexity
 
       # Log campos complexos
-      if field_complexity > 10
-        Rails.logger.info({
-          event: 'complex_graphql_field',
-          field: field_definition.graphql_name,
-          complexity: field_complexity,
-          total_complexity: @complexity,
-          query: @query.query_string&.gsub(/\s+/, ' ')&.strip
-        }.to_json)
-      end
+      return unless field_complexity > 10
+
+      Rails.logger.info({
+        event: 'complex_graphql_field',
+        field: field_definition.graphql_name,
+        complexity: field_complexity,
+        total_complexity: @complexity,
+        query: @query.query_string&.gsub(/\s+/, ' ')&.strip
+      }.to_json)
     end
 
     def result
@@ -42,7 +42,7 @@ module Analyzers
           max_complexity: @max_complexity,
           query: @query.query_string&.gsub(/\s+/, ' ')&.strip
         }.to_json)
-        
+
         nil
       end
     end
@@ -56,19 +56,19 @@ module Analyzers
       # Conexões são mais complexas
       if field_definition.type.list?
         complexity += 2
-        
+
         # Se tem argumentos de paginação, adicionar complexidade baseada no limite
         if node.arguments.any?
           first_arg = node.arguments.find { |arg| arg.name == 'first' }
           last_arg = node.arguments.find { |arg| arg.name == 'last' }
-          
-          if first_arg&.value
-            complexity += (first_arg.value / 10.0).ceil
-          elsif last_arg&.value
-            complexity += (last_arg.value / 10.0).ceil
-          else
-            complexity += 5 # Complexidade padrão para listas sem limite
-          end
+
+          complexity += if first_arg&.value
+                          (first_arg.value / 10.0).ceil
+                        elsif last_arg&.value
+                          (last_arg.value / 10.0).ceil
+                        else
+                          5 # Complexidade padrão para listas sem limite
+                        end
         end
       end
 

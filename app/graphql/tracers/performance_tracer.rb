@@ -17,14 +17,14 @@ module Tracers
           variables: metadata[:variables],
           operation_name: metadata[:operation_name]
         )
-        
+
         result
       when "execute_field"
         start_time = Time.current
         result = yield
         end_time = Time.current
         duration = end_time - start_time
-        
+
         # Log slow field executions (> 100ms)
         if duration > 0.1
           log_slow_field(
@@ -33,7 +33,7 @@ module Tracers
             path: metadata[:path]
           )
         end
-        
+
         result
       else
         yield
@@ -53,15 +53,15 @@ module Tracers
       }.to_json)
 
       # Log slow queries (> 5 seconds)
-      if duration > 5
-        Rails.logger.warn({
-          event: 'slow_graphql_query',
-          duration_ms: (duration * 1000).round(2),
-          query: query,
-          operation_name: operation_name,
-          timestamp: Time.current.iso8601
-        }.to_json)
-      end
+      return unless duration > 5
+
+      Rails.logger.warn({
+        event: 'slow_graphql_query',
+        duration_ms: (duration * 1000).round(2),
+        query: query,
+        operation_name: operation_name,
+        timestamp: Time.current.iso8601
+      }.to_json)
     end
 
     def self.log_slow_field(field:, duration:, path:)

@@ -80,8 +80,8 @@ module Auditable
     when :create
       metadata[:new_values] = attributes.except('created_at', 'updated_at')
     when :update
-      metadata[:previous_values] = saved_changes.transform_values { |changes| changes.first }
-      metadata[:new_values] = saved_changes.transform_values { |changes| changes.last }
+      metadata[:previous_values] = saved_changes.transform_values(&:first)
+      metadata[:new_values] = saved_changes.transform_values(&:last)
     when :destroy
       metadata[:deleted_values] = attributes.except('created_at', 'updated_at')
     end

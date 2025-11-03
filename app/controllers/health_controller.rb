@@ -52,7 +52,7 @@ class HealthController < ApplicationController
     {
       status: 'ok',
       response_time: measure_time do
-        Rails.application.config.redis_pool.with { |redis| redis.ping }
+        Rails.application.config.redis_pool.with(&:ping)
       end
     }
   rescue StandardError => e

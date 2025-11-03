@@ -1,0 +1,180 @@
+# Configuração RuboCop para Guardian Auth
+# Focada em boas práticas sem frescuras excessivas
+
+AllCops:
+  NewCops: enable
+  TargetRubyVersion: 3.3
+  SuggestExtensions: false  # Não sugerir extensões
+  Exclude:
+    - 'db/schema.rb'
+    - 'db/cable_schema.rb'
+    - 'db/cache_schema.rb'
+    - 'db/queue_schema.rb'
+    - 'db/migrate/**/*'
+    - 'bin/**/*'
+    - 'config/**/*'
+    - 'node_modules/**/*'
+    - 'vendor/**/*'
+    - 'tmp/**/*'
+    - 'log/**/*'
+
+# ========================================
+# LAYOUT - Formatação de Código
+# ========================================
+
+Layout/LineLength:
+  Max: 120  # Mais prático que 80
+  Exclude:
+    - 'db/seeds/**/*'
+
+Layout/TrailingWhitespace:
+  Enabled: true
+
+Layout/EmptyLinesAroundClassBody:
+  Enabled: false  # Flexível
+
+Layout/EmptyLinesAroundModuleBody:
+  Enabled: false  # Flexível
+
+Layout/EmptyLines:
+  Enabled: false  # Não ser chato com linhas vazias
+
+# ========================================
+# STYLE - Estilo de Código
+# ========================================
+
+Style/Documentation:
+  Enabled: false  # Não forçar documentação
+
+Style/FrozenStringLiteralComment:
+  Enabled: false  # SEM frozen string literal obrigatório
+
+Style/StringLiterals:
+  Enabled: false  # Permitir aspas simples e duplas livremente
+
+Style/ClassAndModuleChildren:
+  Enabled: false  # Permitir namespace compacto
+
+Style/GuardClause:
+  Enabled: true
+  MinBodyLength: 5  # Apenas para métodos maiores
+
+Style/SymbolArray:
+  Enabled: false  # Permitir %i[] e []
+
+Style/WordArray:
+  Enabled: false  # Permitir %w[] e []
+
+Style/IfUnlessModifier:
+  Enabled: false  # Não forçar modificadores
+
+Style/EmptyLinesAfterModuleInclusion:
+  Enabled: false
+
+Style/SafeNavigation:
+  Enabled: false  # Não forçar &.
+
+Style/RedundantAssignment:
+  Enabled: false
+
+# ========================================
+# METRICS - Complexidade de Código
+# ========================================
+
+Metrics/MethodLength:
+  Max: 40  # Mais prático
+  CountComments: false
+
+Metrics/ClassLength:
+  Max: 250
+  CountComments: false
+
+Metrics/ModuleLength:
+  Max: 250
+  CountComments: false
+
+Metrics/BlockLength:
+  Max: 40
+  Exclude:
+    - 'spec/**/*'
+    - 'test/**/*'
+    - 'config/routes.rb'
+    - 'config/environments/**/*'
+    - 'db/seeds/**/*'
+  AllowedMethods:
+    - describe
+    - context
+    - namespace
+    - task
+    - class_methods
+
+Metrics/AbcSize:
+  Max: 30
+  Exclude:
+    - 'test/**/*'
+    - 'db/seeds/**/*'
+
+Metrics/CyclomaticComplexity:
+  Max: 12
+
+Metrics/PerceivedComplexity:
+  Max: 12
+
+Metrics/ParameterLists:
+  Max: 6
+  CountKeywordArgs: false
+
+# ========================================
+# NAMING - Convenções de Nomenclatura
+# ========================================
+
+Naming/PredicateName:
+  Enabled: false  # Permitir has_role?, is_valid?, etc
+
+Naming/VariableNumber:
+  Enabled: false  # Permitir user1, user2
+
+Naming/MethodParameterName:
+  MinNameLength: 1  # Permitir e, i, x, etc
+  AllowedNames:
+    - e
+    - ex
+    - id
+    - ip
+    - to
+    - _
+
+Naming/PredicateMethod:
+  Enabled: false  # Não forçar ? no final
+
+# ========================================
+# LINT - Erros Reais
+# ========================================
+
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
+Lint/AmbiguousBlockAssociation:
+  Enabled: false  # Muito chato em testes
+
+Lint/UnusedMethodArgument:
+  Enabled: false  # Muitos falsos positivos
+
+Lint/UnusedBlockArgument:
+  Enabled: false
+
+Lint/UselessAccessModifier:
+  Enabled: false
+
+Lint/DuplicateBranch:
+  Enabled: false
+
+Lint/RedundantSafeNavigation:
+  Enabled: false
+
+Lint/RedundantStringCoercion:
+  Enabled: false
+

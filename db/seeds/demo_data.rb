@@ -32,20 +32,20 @@ DEMO_USERS_COUNT.times do |i|
   first_name = first_names.sample
   last_name = last_names.sample
   email = "demo#{i + 1}@exemplo.com"
-  
+
   user = User.find_or_create_by!(email: email) do |u|
     u.first_name = first_name
     u.last_name = last_name
     u.password = 'Demo123456'
     u.role = 'user'
   end
-  
+
   # Simula alguns logins passados
-  if rand > 0.3  # 70% chance de ter feito login
+  if rand > 0.3 # 70% chance de ter feito login
     user.update!(last_login_at: rand(30.days).seconds.ago)
   end
-  
-  print "." if (i + 1) % 10 == 0
+
+  print "." if ((i + 1) % 10).zero?
 end
 
 puts "\nCriando #{DEMO_ADMINS_COUNT} admins de demonstração..."
@@ -54,17 +54,17 @@ DEMO_ADMINS_COUNT.times do |i|
   first_name = first_names.sample
   last_name = last_names.sample
   email = "admin-demo#{i + 1}@exemplo.com"
-  
+
   admin = User.find_or_create_by!(email: email) do |u|
     u.first_name = first_name
     u.last_name = last_name
     u.password = 'Admin123456'
     u.role = 'admin'
   end
-  
+
   # Admins fazem login mais frequentemente
   admin.update!(last_login_at: rand(7.days).seconds.ago)
-  
+
   puts "Admin demo criado: #{admin.email}"
 end
 

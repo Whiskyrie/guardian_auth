@@ -19,11 +19,11 @@ module GraphQL
     def self.trace_query_execution(data)
       start_time = Time.current
       query = data[:query]
-      
+
       # Extract operation details
       operation_name = query.operation_name
       operation_type = query.selected_operation&.operation_type || 'unknown'
-      
+
       # Log the incoming request
       GraphqlLogger.log_query(
         query: query.query_string,
@@ -34,7 +34,7 @@ module GraphQL
       )
 
       result = yield
-      
+
       # Calculate duration
       duration = ((Time.current - start_time) * 1000).round(2)
 
@@ -53,7 +53,7 @@ module GraphQL
       result
     rescue StandardError => e
       duration = ((Time.current - start_time) * 1000).round(2)
-      
+
       # Log unexpected errors
       GraphqlLogger.log_error(
         error: e,
@@ -109,7 +109,7 @@ module GraphQL
 
       # Remove sensitive information from context for logging
       sanitized = context.to_h.except(:current_user_token, :request)
-      
+
       # Add safe user information if available
       if context[:current_user]
         sanitized[:user_id] = context[:current_user].id

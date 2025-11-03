@@ -21,9 +21,9 @@ gem 'pundit'
 gem 'rack-attack'
 
 # Redis & Performance
-gem 'redis', '~> 5.0'
 gem 'connection_pool'
 gem 'hiredis-client'
+gem 'redis', '~> 5.0'
 
 # Formatador
 gem 'rubocop'
@@ -40,7 +40,7 @@ gem 'rack-cors'
 gem 'dotenv-rails'
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: %i[windows jruby]
+gem 'tzinfo-data', platforms: [:windows, :jruby]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem 'solid_cable'
@@ -61,7 +61,7 @@ gem 'thruster', require: false
 
 group :development, :test do
   gem 'brakeman', require: false
-  gem 'debug', platforms: %i[mri windows], require: 'debug/prelude'
+  gem 'debug', platforms: [:mri, :windows], require: 'debug/prelude'
   gem 'rubocop-rails-omakase', require: false
 end
 

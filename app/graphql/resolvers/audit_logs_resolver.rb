@@ -20,7 +20,8 @@ module Resolvers
       # Authorization check
       current_user = context[:current_user]
       raise GraphQL::ExecutionError, "Authentication required" unless current_user
-      raise GraphQL::ExecutionError, "Insufficient permissions" unless current_user.has_permission?('audit_logs', 'read')
+      raise GraphQL::ExecutionError, "Insufficient permissions" unless current_user.has_permission?('audit_logs',
+                                                                                                    'read')
 
       # Start with base query
       query = AuditLog.all
