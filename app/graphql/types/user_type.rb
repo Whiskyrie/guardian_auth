@@ -12,7 +12,7 @@ module Types
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false,
                                                         description: "Data e hora de criação da conta"
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false,
-                                                        description: "Data e hora da última atualização dos dados do usuário"
+                                                        description: "Data e hora da última atualização dos dados"
 
     # Helper fields
     field :full_name, String, null: true,

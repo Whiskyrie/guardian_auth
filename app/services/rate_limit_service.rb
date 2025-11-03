@@ -52,7 +52,8 @@ class RateLimitService
       # Check if limit would be exceeded with this request
       if cache_data[:count] >= limit
         # Log the blocked attempt
-        Rails.logger.warn "Rate limit exceeded for #{operation} - Identifier: #{identifier}, Count: #{cache_data[:count] + 1}/#{limit}"
+        Rails.logger.warn "Rate limit exceeded for #{operation} - Identifier: #{identifier}, " \
+                          "Count: #{cache_data[:count] + 1}/#{limit}"
 
         return {
           allowed: false,

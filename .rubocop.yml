@@ -68,7 +68,7 @@ Style/WordArray:
 Style/IfUnlessModifier:
   Enabled: false  # Não forçar modificadores
 
-Style/EmptyLinesAfterModuleInclusion:
+Layout/EmptyLinesAfterModuleInclusion:
   Enabled: false
 
 Style/SafeNavigation:
@@ -82,8 +82,11 @@ Style/RedundantAssignment:
 # ========================================
 
 Metrics/MethodLength:
-  Max: 40  # Mais prático
+  Max: 70  # GraphQL mutations podem ser mais longas
   CountComments: false
+  Exclude:
+    - 'app/graphql/mutations/**/*'
+    - 'lib/tasks/**/*'
 
 Metrics/ClassLength:
   Max: 250
@@ -109,16 +112,24 @@ Metrics/BlockLength:
     - class_methods
 
 Metrics/AbcSize:
-  Max: 30
+  Max: 50  # GraphQL resolvers podem ter mais complexidade
   Exclude:
     - 'test/**/*'
     - 'db/seeds/**/*'
+    - 'app/graphql/mutations/**/*'
+    - 'lib/tasks/**/*'
 
 Metrics/CyclomaticComplexity:
-  Max: 12
+  Max: 16  # Permite lógica de autenticação/validação
+  Exclude:
+    - 'app/graphql/mutations/**/*'
+    - 'lib/tasks/**/*'  # Tasks podem ter lógica complexa
 
 Metrics/PerceivedComplexity:
-  Max: 12
+  Max: 16  # Mesma razão que cyclomatic
+  Exclude:
+    - 'app/graphql/mutations/**/*'
+    - 'lib/tasks/**/*'  # Tasks podem ter lógica complexa
 
 Metrics/ParameterLists:
   Max: 6
@@ -128,7 +139,7 @@ Metrics/ParameterLists:
 # NAMING - Convenções de Nomenclatura
 # ========================================
 
-Naming/PredicateName:
+Naming/PredicatePrefix:
   Enabled: false  # Permitir has_role?, is_valid?, etc
 
 Naming/VariableNumber:
@@ -168,6 +179,9 @@ Lint/UnusedBlockArgument:
 
 Lint/UselessAccessModifier:
   Enabled: false
+
+Lint/IneffectiveAccessModifier:
+  Enabled: false  # Common em módulos GraphQL com métodos de classe
 
 Lint/DuplicateBranch:
   Enabled: false

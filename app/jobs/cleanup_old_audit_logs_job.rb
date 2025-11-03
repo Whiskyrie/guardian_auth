@@ -11,7 +11,8 @@ class CleanupOldAuditLogsJob < ApplicationJob
     # Delete old audit logs
     deleted_count = AuditLog.where('created_at < ?', cutoff_date).delete_all
 
-    Rails.logger.info "CleanupOldAuditLogsJob completed: removed #{deleted_count} audit logs older than #{retention_days} days"
+    Rails.logger.info "CleanupOldAuditLogsJob completed: removed #{deleted_count} audit logs " \
+                      "older than #{retention_days} days"
 
     # Optional: Send metrics or notifications if using monitoring tools
     # ApplicationMetrics.increment('audit.logs.cleanup', deleted_count) if defined?(ApplicationMetrics)

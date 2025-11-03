@@ -36,7 +36,9 @@ class User < ApplicationRecord
             length: { minimum: 8, maximum: 128 },
             format: {
               with: PASSWORD_REGEX,
-              message: 'deve conter pelo menos 8 caracteres, incluindo pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&)'
+              message: 'deve conter pelo menos 8 caracteres, incluindo pelo menos ' \
+                       'uma letra maiúscula, uma minúscula, um número e um ' \
+                       'caractere especial (@$!%*?&)'
             },
             exclusion: {
               in: WEAK_PASSWORDS,

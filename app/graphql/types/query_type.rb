@@ -16,7 +16,7 @@ module Types
     end
 
     field :nodes, [Types::NodeType, { null: true }], null: true,
-                                                     description: 'Busca uma lista de objetos pelos seus IDs globais únicos' do
+                                                     description: 'Busca objetos pelos seus IDs globais únicos' do
       argument :ids, [ID], required: true,
                            description: 'Lista de IDs globais únicos dos objetos a serem buscados'
     end
@@ -52,12 +52,14 @@ module Types
     field :audit_logs, resolver: Resolvers::AuditLogsResolver,
                        max_page_size: 100, # Allow larger page size for audit logs
                        default_page_size: 20, # Default page size for audit logs
-                       description: 'Consulta logs de auditoria para monitoramento de segurança (apenas administradores)'
+                       description: 'Consulta logs de auditoria para monitoramento de segurança ' \
+                                    '(apenas administradores)'
 
     # Health check and system info
     field :test_field, String, null: false,
                                description: 'Campo de teste para verificar conectividade da API',
-                               deprecation_reason: "Este campo será removido em versões futuras. Use health checks específicos."
+                               deprecation_reason: 'Este campo será removido em versões futuras. ' \
+                                                   'Use health checks específicos.'
 
     def test_field
       'Hello World!'

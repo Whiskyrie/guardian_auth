@@ -1,4 +1,4 @@
-cated)
+# DEPRECATED
 # This file is kept for reference but functionality has been moved to Rack::Attack
 # See config/initializers/rack_attack.rb for current rate limiting configuration
 

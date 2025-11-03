@@ -217,7 +217,6 @@
       end
     end
   end
-end
 
 # Subscribe to notifications for logging
 ActiveSupport::Notifications.subscribe('throttle.rack_attack') do |name, start, finish, instrumenter_id, payload|
