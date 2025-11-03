@@ -1,12 +1,12 @@
 
   # Use dedicated Redis cache store for rate limiting
-  cache.store = Rails.application.config.rate_limit_cache_store
+  Rack::Attack.cache.store = Rails.application.config.rate_limit_cache_store
 
   # Enable Retry-After header for better client behavior
-  self.throttled_response_retry_after_header = true
+  Rack::Attack.throttled_response_retry_after_header = true
 
   # Custom throttled response with security headers
-  self.throttled_responder = lambda do |request|
+  Rack::Attack.throttled_responder = lambda do |request|
     match_data = request.env['rack.attack.match_data']
     now = match_data[:epoch_time]
 
@@ -40,7 +40,7 @@
   end
 
   # Custom blocklisted response
-  self.blocklisted_responder = lambda do |request|
+  Rack::Attack.blocklisted_responder = lambda do |request|
     headers = {
       'Content-Type' => 'application/json',
       'X-Content-Type-Options' => 'nosniff',
@@ -63,12 +63,12 @@
   end
 
   # Safelist localhost and common development IPs
-  safelist('allow from localhost') do |req|
+  Rack::Attack.safelist('allow from localhost') do |req|
     ['127.0.0.1', '::1'].include?(req.ip)
   end
 
   # Safelist authenticated admin users (if API key present)
-  safelist('allow authenticated admins') do |req|
+  Rack::Attack.safelist('allow authenticated admins') do |req|
     # Extract user from JWT token
     auth_header = req.get_header('HTTP_AUTHORIZATION')
     if auth_header
@@ -86,7 +86,7 @@
   end
 
   # Block suspicious paths and common attack vectors
-  blocklist('block suspicious requests') do |req|
+  Rack::Attack.blocklist('block suspicious requests') do |req|
     # Block requests to common vulnerable paths
     suspicious_paths = [
       '/wp-admin', '/wp-login', '/wordpress',
@@ -108,7 +108,7 @@
   end
 
   # Fail2Ban: Block IPs that make repeated bad requests
-  blocklist('fail2ban bad requests') do |req|
+  Rack::Attack.blocklist('fail2ban bad requests') do |req|
     # Block after 3 bad requests in 10 minutes, ban for 1 hour
     Rack::Attack::Fail2Ban.filter("bad-requests-#{req.ip}", maxretry: 3, findtime: 10.minutes, bantime: 1.hour) do
       # Consider 4xx responses as bad requests (except 401, 404, 429)
@@ -119,18 +119,18 @@
   end
 
   # General request throttling by IP
-  throttle('requests by ip', limit: 300, period: 5.minutes) do |req|
+  Rack::Attack.throttle('requests by ip', limit: 300, period: 5.minutes) do |req|
     req.ip unless req.path.start_with?('/assets', '/health')
   end
 
   # GraphQL specific throttling
-  throttle('graphql requests', limit: 60, period: 1.minute) do |req|
+  Rack::Attack.throttle('graphql requests', limit: 60, period: 1.minute) do |req|
     req.ip if req.path == '/graphql' && req.post?
   end
 
   # Login attempts throttling with exponential backoff
   (1..5).each do |level|
-    throttle("login attempts level #{level}", limit: (5 * level), period: (2**level).minutes) do |req|
+    Rack::Attack.throttle("login attempts level #{level}", limit: (5 * level), period: (2**level).minutes) do |req|
       if req.path == '/graphql' && req.post?
         # Extract operation name from GraphQL request
         begin
@@ -149,7 +149,7 @@
   end
 
   # User-specific login throttling (after authentication)
-  throttle('login attempts by email', limit: 10, period: 10.minutes) do |req|
+  Rack::Attack.throttle('login attempts by email', limit: 10, period: 10.minutes) do |req|
     if req.path == '/graphql' && req.post?
       begin
         body = req.body.read
@@ -170,7 +170,7 @@
   end
 
   # Allow2Ban: More lenient blocking for login scrapers
-  blocklist('allow2ban login scrapers') do |req|
+  Rack::Attack.blocklist('allow2ban login scrapers') do |req|
     # Allow requests until hitting limit, then block
     # After 20 failed logins in 5 minutes, block for 2 hours
     Rack::Attack::Allow2Ban.filter(req.ip, maxretry: 20, findtime: 5.minutes, bantime: 2.hours) do
@@ -191,7 +191,7 @@
   end
 
   # Track special user agents for monitoring
-  track('suspicious user agents') do |req|
+  Rack::Attack.track('suspicious user agents') do |req|
     suspicious_agents = [
       /bot/i, /crawl/i, /spider/i, /scan/i,
       /curl/i, /wget/i, /python/i, /java/i
@@ -202,7 +202,7 @@
   end
 
   # Track password change attempts for security monitoring
-  track('password changes', limit: 5, period: 1.hour) do |req|
+  Rack::Attack.track('password changes', limit: 5, period: 1.hour) do |req|
     if req.path == '/graphql' && req.post?
       begin
         body = req.body.read
