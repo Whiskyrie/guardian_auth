@@ -279,22 +279,85 @@ bundle exec rubocop -a
 Para verificar vulnerabilidades de segurança:
 
 ```bash
+# Security scan com Brakeman
 bundle exec brakeman
+
+# Verificar vulnerabilidades em dependências
+bundle exec bundler-audit check
+
+# Atualizar database de vulnerabilidades
+bundle exec bundler-audit update
 ```
 
-## 🤝 Contribuindo
+**Documentação de Segurança:**
+- [Guia de Proteção de Branches](.github/BRANCH_PROTECTION.md) - Como configurar proteções no GitHub
+- [Guia de Segurança](.github/SECURITY_GUIDE.md) - Práticas e checklist de segurança
 
-1. Faça um fork do projeto
+### CI/CD
+
+O projeto possui workflows automatizados para garantir qualidade:
+
+- **RuboCop**: Linting e estilo de código
+- **Brakeman**: Análise de segurança
+- **Bundler Audit**: Verificação de vulnerabilidades em gems
+- **Tests**: Suite completa de testes
+- **CodeQL**: Análise de segurança do GitHub
+
+Todos os checks devem passar antes de merge em `main` ou `develop`.
+
+## Contribuindo
+
+Contribuições são bem-vindas! Por favor, siga estas diretrizes:
+
+### Processo de Contribuição
+
+1. Fork o projeto
 2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Crie um Pull Request
+3. Siga as convenções de código (veja [AGENTS.md](AGENTS.md))
+4. Escreva testes para novas funcionalidades
+5. Execute os testes e validações:
+   ```bash
+   bundle exec rubocop
+   bundle exec brakeman
+   bundle exec bundler-audit check
+   rails test
+   ```
+6. Commit suas mudanças usando [Conventional Commits](https://www.conventionalcommits.org/):
+   ```bash
+   git commit -m "feat(auth): adiciona autenticação de dois fatores"
+   ```
+7. Push para sua branch (`git push origin feature/nova-feature`)
+8. Abra um Pull Request seguindo o template
 
-## 📄 Licença
+### Padrão de Commits
+
+Use o padrão Conventional Commits:
+
+- `feat(escopo):` - Nova funcionalidade
+- `fix(escopo):` - Correção de bug
+- `docs(escopo):` - Apenas documentação
+- `refactor(escopo):` - Refatoração de código
+- `test(escopo):` - Adição/atualização de testes
+- `chore(escopo):` - Tarefas de manutenção
+
+### Code Review
+
+Todos os PRs passam por code review e devem:
+- Ter aprovação de pelo menos 1 revisor (develop) ou 2 revisores (main)
+- Passar em todos os checks de CI/CD
+- Resolver todas as conversas
+- Estar atualizado com a branch base
+
+### Proteção de Branches
+
+- **`main`**: Requer 2 aprovações, todos os checks, commits assinados
+- **`develop`**: Requer 1 aprovação, checks básicos (RuboCop, Tests)
+
+## Licença
 
 Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
 
-## 🙋‍♂️ Suporte
+## Suporte
 
 Se você tiver alguma dúvida ou problema, por favor:
 

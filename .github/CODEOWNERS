@@ -1,0 +1,72 @@
+# CODEOWNERS - Guardian Auth
+# Este arquivo define quem deve revisar mudanças em partes específicas do código
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ===========================
+# Global (Fallback)
+# ===========================
+* @Whiskyrie
+
+# ===========================
+# GraphQL e API
+# ===========================
+/app/graphql/ @Whiskyrie
+/app/graphql/mutations/ @Whiskyrie
+/app/graphql/types/ @Whiskyrie
+/app/graphql/resolvers/ @Whiskyrie
+
+# ===========================
+# Segurança e Autenticação
+# ===========================
+/app/services/jwt_service.rb @Whiskyrie
+/app/services/audit_logger.rb @Whiskyrie
+/app/services/security_logger.rb @Whiskyrie
+/app/services/rate_limit_service.rb @Whiskyrie
+
+# Middleware de segurança
+/app/middleware/ @Whiskyrie
+
+# Policies de autorização
+/app/policies/ @Whiskyrie
+
+# Models críticos
+/app/models/user.rb @Whiskyrie
+/app/models/token_blacklist.rb @Whiskyrie
+/app/models/audit_log.rb @Whiskyrie
+
+# ===========================
+# Configurações Sensíveis
+# ===========================
+/config/initializers/rack_attack.rb @Whiskyrie
+/config/initializers/rate_limiting.rb @Whiskyrie
+/config/initializers/cors.rb @Whiskyrie
+/config/credentials.yml.enc @Whiskyrie
+
+# ===========================
+# CI/CD e Deploy
+# ===========================
+/.github/workflows/ @Whiskyrie
+/config/deploy.yml @Whiskyrie
+/Dockerfile @Whiskyrie
+/docker-compose*.yml @Whiskyrie
+
+# ===========================
+# Banco de Dados
+# ===========================
+/db/migrate/ @Whiskyrie
+/db/schema.rb @Whiskyrie
+/db/seeds.rb @Whiskyrie
+/db/seeds/ @Whiskyrie
+
+# ===========================
+# Dependências
+# ===========================
+/Gemfile @Whiskyrie
+/Gemfile.lock @Whiskyrie
+
+# ===========================
+# Documentação Crítica
+# ===========================
+/AGENTS.md @Whiskyrie
+/.github/BRANCH_PROTECTION.md @Whiskyrie
+/README.md @Whiskyrie
