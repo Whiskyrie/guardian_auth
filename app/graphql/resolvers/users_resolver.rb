@@ -15,8 +15,9 @@ module Resolvers
       # Aplicar autorização primeiro
       authorize!(User, :index?)
 
-      # Construir query com filtros
+      # Construir query com filtros e eager loading para prevenir N+1
       users = apply_filters(User.all, args)
+      users = users.includes(:roles) # Prevenção de N+1 queries
 
       # GraphQL-Ruby aplicará paginação automaticamente
       users.order(:created_at)
