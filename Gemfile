@@ -62,7 +62,16 @@ gem 'thruster', require: false
 group :development, :test do
   gem 'brakeman', require: false
   gem 'debug', platforms: [:mri, :windows], require: 'debug/prelude'
+  gem 'factory_bot_rails'
+  gem 'faker'
+  gem 'rspec-rails', '~> 7.1'
   gem 'rubocop-rails-omakase', require: false
+  gem 'rubocop-rspec', require: false
+end
+
+group :test do
+  gem 'shoulda-matchers', '~> 6.0'
+  gem 'simplecov', require: false
 end
 
 group :development do
