@@ -12,6 +12,8 @@ module Mutations
     field :errors, [Types::UserErrorType], null: false, description: "Any error messages"
 
     def resolve(user_id:, role_names:)
+      authenticate!
+
       user = User.find_by(id: user_id)
 
       unless user

@@ -10,6 +10,8 @@ module Mutations
     field :errors, [Types::UserErrorType], null: false, description: "Any error messages"
 
     def resolve(id:)
+      authenticate!
+
       user = User.find_by(id: id)
 
       unless user
@@ -36,12 +38,6 @@ module Mutations
           errors: format_model_errors(user)
         }
       end
-    rescue GraphQL::ExecutionError => e
-      {
-        success: false,
-        message: e.message,
-        errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS, "not authorized")
-      }
     rescue StandardError => e
       {
         success: false,
