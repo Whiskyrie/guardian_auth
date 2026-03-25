@@ -12,7 +12,7 @@ module Mutations
 
     field :token, String, null: true, description: 'JWT authentication token'
     field :user, Types::UserType, null: true, description: 'Created user object'
-    field :errors, [String], null: false, description: 'List of validation errors'
+    field :errors, [Types::UserErrorType], null: false, description: 'List of validation errors'
 
     def resolve(email:, password:, first_name:, last_name:)
       # Normalize email
@@ -36,7 +36,7 @@ module Mutations
         {
           token: nil,
           user: nil,
-          errors: user.errors.full_messages
+          errors: format_model_errors(user)
         }
       end
     rescue StandardError => e
@@ -44,7 +44,7 @@ module Mutations
       {
         token: nil,
         user: nil,
-        errors: ['Registration failed. Please try again.']
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Registration failed. Please try again.')
       }
     end
   end

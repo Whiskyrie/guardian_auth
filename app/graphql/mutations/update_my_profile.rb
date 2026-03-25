@@ -5,17 +5,14 @@ module Mutations
     argument :input, Types::UserInputType, description: 'User fields to update'
 
     field :user, Types::UserType, null: true
-    field :errors, [String], null: false
+    field :errors, [Types::UserErrorType], null: false
 
     def resolve(input:)
-      # Verificar se o usuário está autenticado
-      unless current_user
-        return { user: nil, errors: ['Authentication required'] }
-      end
+      authenticate!
 
       # Não permitir alteração de role em perfil próprio
       if input[:role].present?
-        return { user: nil, errors: ['Cannot change your own role. Contact an administrator.'] }
+        return { user: nil, errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS, 'Cannot change your own role. Contact an administrator.') }
       end
 
       update_attrs = input.to_h.compact
@@ -23,7 +20,7 @@ module Mutations
       if current_user.update(update_attrs)
         { user: current_user, errors: [] }
       else
-        { user: nil, errors: current_user.errors.full_messages }
+        { user: nil, errors: format_model_errors(current_user) }
       end
     end
   end

@@ -8,7 +8,7 @@ module Types
     field :user, UserType, null: true,
                            description: "Dados do usuário autenticado"
 
-    field :errors, [String], null: false,
-                             description: "Lista de erros que ocorreram durante a operação de autenticação"
+    field :errors, [Types::UserErrorType], null: false,
+                                           description: "Lista de erros que ocorreram durante a operação de autenticação"
   end
 end

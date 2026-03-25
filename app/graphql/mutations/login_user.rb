@@ -10,7 +10,7 @@ module Mutations
 
     field :token, String, null: true, description: 'JWT authentication token'
     field :user, Types::UserType, null: true, description: 'Authenticated user object'
-    field :errors, [String], null: false, description: 'List of authentication errors'
+    field :errors, [Types::UserErrorType], null: false, description: 'List of authentication errors'
 
     def resolve(email:, password:)
       # Normalize and sanitize email input
@@ -29,7 +29,7 @@ module Mutations
         return {
           token: nil,
           user: nil,
-          errors: ['Email e senha são obrigatórios']
+          errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, 'Email e senha são obrigatórios')
         }
       end
 
@@ -76,7 +76,7 @@ module Mutations
         {
           token: nil,
           user: nil,
-          errors: ['Email ou senha inválidos!']
+          errors: auth_error(Errors::ErrorCodes::INVALID_CREDENTIALS, 'Email ou senha inválidos!')
         }
       end
     rescue StandardError => e
@@ -99,7 +99,7 @@ module Mutations
       {
         token: nil,
         user: nil,
-        errors: ['Falha na autenticação. Tente novamente.']
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Falha na autenticação. Tente novamente.')
       }
     end
   end
