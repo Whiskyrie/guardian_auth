@@ -6,11 +6,9 @@ module Mutations
     field :message, String, null: true
 
     def resolve
-      # Get current user and token from context
-      current_user = context[:current_user]
       current_token = context[:current_token]
 
-      unless current_user
+      unless authenticated?
         return { success: false, message: "User not authenticated" }
       end
 
