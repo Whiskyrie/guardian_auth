@@ -6,14 +6,14 @@ module Mutations
     argument :input, Types::UserInputType, description: 'User fields to update'
 
     field :user, Types::UserType, null: true
-    field :errors, [String], null: false
+    field :errors, [Types::UserErrorType], null: false
 
     def resolve(id:, input:)
       # Buscar o usuário pelo GlobalID
       user = GlobalID.find(id)
 
       unless user
-        return { user: nil, errors: ['User not found'] }
+        return { user: nil, errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found') }
       end
 
       # Verificar autorização usando Pundit
@@ -47,7 +47,7 @@ module Mutations
 
         { user: user, errors: [] }
       else
-        { user: nil, errors: user.errors.full_messages }
+        { user: nil, errors: format_model_errors(user) }
       end
     end
 
@@ -56,10 +56,14 @@ module Mutations
     def validate_role_change(input)
       return unless input[:role].present?
 
-      return { user: nil, errors: ['Only administrators can change user roles'] } unless current_user&.admin?
+      unless current_user&.admin?
+        return { user: nil,
+                 errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
+                                    'Only administrators can change user roles') }
+      end
 
       unless User::VALID_ROLES.include?(input[:role])
-        return { user: nil, errors: ["Invalid role. Must be one of: #{User::VALID_ROLES.join(', ')}"] }
+        return { user: nil, errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, "Invalid role. Must be one of: #{User::VALID_ROLES.join(', ')}") }
       end
 
       nil
@@ -90,7 +94,8 @@ module Mutations
         days_remaining = 7 - days_since_update
         return {
           user: nil,
-          errors: ["Você só pode alterar seu perfil uma vez a cada 7 dias. Aguarde #{days_remaining} dia(s)."]
+          errors: auth_error(Errors::ErrorCodes::VALIDATION_FAILED,
+                             "Você só pode alterar seu perfil uma vez a cada 7 dias. Aguarde #{days_remaining} dia(s).")
         }
       end
 

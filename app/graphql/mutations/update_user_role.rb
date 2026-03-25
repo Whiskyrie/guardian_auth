@@ -1,6 +1,5 @@
 module Mutations
-  class UpdateUserRole < GraphQL::Schema::Mutation
-    include AuthorizationHelper
+  class UpdateUserRole < BaseMutation
 
     description "Update user roles (admin only)"
 
@@ -10,7 +9,7 @@ module Mutations
     field :user, Types::UserType, null: true, description: "Updated user"
     field :success, Boolean, null: false, description: "Whether the operation was successful"
     field :message, String, null: false, description: "Result message"
-    field :errors, [String], null: true, description: "Any error messages"
+    field :errors, [Types::UserErrorType], null: false, description: "Any error messages"
 
     def resolve(user_id:, role_names:)
       user = User.find_by(id: user_id)
@@ -20,7 +19,7 @@ module Mutations
           user: nil,
           success: false,
           message: "User not found",
-          errors: ["User with ID #{user_id} does not exist"]
+          errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, "User with ID #{user_id} does not exist")
         }
       end
 
@@ -30,7 +29,8 @@ module Mutations
           user: nil,
           success: false,
           message: "You are not authorized to modify user roles",
-          errors: ["Insufficient permissions"]
+          errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
+                             "You are not authorized to modify user roles")
         }
       end
 
@@ -41,7 +41,7 @@ module Mutations
           user: nil,
           success: false,
           message: "Invalid roles provided",
-          errors: ["Unknown roles: #{invalid_roles.join(', ')}"]
+          errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, "Unknown roles: #{invalid_roles.join(', ')}")
         }
       end
 
@@ -56,21 +56,16 @@ module Mutations
         user: user.reload,
         success: true,
         message: "User roles updated successfully",
-        errors: nil
+        errors: []
       }
     rescue StandardError => e
       {
         user: nil,
         success: false,
         message: "An error occurred while updating user roles",
-        errors: [e.message]
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, e.message)
       }
     end
 
-    private
-
-    def current_user
-      context[:current_user]
-    end
   end
 end

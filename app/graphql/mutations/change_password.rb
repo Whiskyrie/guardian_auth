@@ -1,6 +1,5 @@
 module Mutations
-  class ChangePassword < GraphQL::Schema::Mutation
-    include AuthorizationHelper
+  class ChangePassword < BaseMutation
     include RateLimitMutation
 
     description 'Change user password'
@@ -10,7 +9,7 @@ module Mutations
     argument :new_password, String, required: true, description: "User's new password (minimum 8 characters)"
 
     field :user, Types::UserType, null: true, description: 'Updated user object'
-    field :errors, [String], null: false, description: 'List of validation errors'
+    field :errors, [Types::UserErrorType], null: false, description: 'List of validation errors'
 
     def resolve(current_password:, new_password:)
       authenticate!
@@ -20,7 +19,7 @@ module Mutations
       unless user.authenticate(current_password)
         return {
           user: nil,
-          errors: ['Senha atual inválida!']
+          errors: auth_error(Errors::ErrorCodes::INVALID_CREDENTIALS, 'Senha atual inválida!')
         }
       end
 
@@ -37,33 +36,15 @@ module Mutations
       else
         {
           user: nil,
-          errors: user.errors.full_messages
+          errors: format_model_errors(user)
         }
       end
     rescue StandardError
       {
         user: nil,
-        errors: ['Password change failed. Please try again.']
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Password change failed. Please try again.')
       }
     end
 
-    private
-
-    # Helper method to access current_user from context
-    def current_user
-      context[:current_user]
-    end
-
-    # Helper method to check if user is authenticated
-    def authenticated?
-      current_user.present?
-    end
-
-    # Helper method to require authentication
-    def authenticate!
-      return true if authenticated?
-
-      raise GraphQL::ExecutionError, 'Authentication required. Please provide a valid token.'
-    end
   end
 end

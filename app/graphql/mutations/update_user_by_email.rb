@@ -6,14 +6,14 @@ module Mutations
     argument :input, Types::UserInputType, description: 'User fields to update'
 
     field :user, Types::UserType, null: true
-    field :errors, [String], null: false
+    field :errors, [Types::UserErrorType], null: false
 
     def resolve(email:, input:)
       # Buscar o usuário pelo email
       user = User.find_by_email(email)
 
       unless user
-        return { user: nil, errors: ['User not found'] }
+        return { user: nil, errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found') }
       end
 
       # Verificar autorização usando Pundit
@@ -27,7 +27,7 @@ module Mutations
       if user.update(update_attrs)
         { user: user, errors: [] }
       else
-        { user: nil, errors: user.errors.full_messages }
+        { user: nil, errors: format_model_errors(user) }
       end
     end
 
@@ -36,10 +36,14 @@ module Mutations
     def validate_role_change(input)
       return unless input[:role].present?
 
-      return { user: nil, errors: ['Only administrators can change user roles'] } unless current_user&.admin?
+      unless current_user&.admin?
+        return { user: nil,
+                 errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
+                                    'Only administrators can change user roles') }
+      end
 
       unless User::VALID_ROLES.include?(input[:role])
-        return { user: nil, errors: ["Invalid role. Must be one of: #{User::VALID_ROLES.join(', ')}"] }
+        return { user: nil, errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, "Invalid role. Must be one of: #{User::VALID_ROLES.join(', ')}") }
       end
 
       nil
