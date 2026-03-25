@@ -51,6 +51,18 @@ class JwtService
     true
   end
 
+  # Check if a token is blacklisted (works with expired tokens too)
+  # Useful for refresh token validation where tokens may be expired
+  def self.token_blacklisted?(token)
+    decoded = decode_without_verification(token)
+    return false unless decoded
+
+    jti = decoded['jti']
+    return false unless jti
+
+    blacklisted?(jti)
+  end
+
   def self.blacklisted?(jti)
     TokenBlacklist.blacklisted?(jti)
   end

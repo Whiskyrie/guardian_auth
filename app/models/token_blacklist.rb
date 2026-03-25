@@ -2,7 +2,7 @@ class TokenBlacklist < ApplicationRecord
   belongs_to :user
 
   # Constants
-  VALID_REASONS = %w[logout password_change security_breach admin_logout].freeze
+  VALID_REASONS = %w[logout password_change security_breach admin_logout token_refresh].freeze
 
   # Validations
   validates :jti, presence: true, uniqueness: true
