@@ -70,21 +70,7 @@ module RateLimitMutation
     private
 
     def extract_client_ip
-      request = context[:request]
-      return '127.0.0.1' unless request
-
-      # Try various headers to get real IP
-      forwarded_for = request.headers['HTTP_X_FORWARDED_FOR']
-      real_ip = request.headers['HTTP_X_REAL_IP']
-
-      if forwarded_for.present?
-        # Take the first IP in the chain (original client)
-        forwarded_for.split(',').first.strip
-      elsif real_ip.present?
-        real_ip
-      else
-        request.remote_ip
-      end
+      context[:remote_ip] || '127.0.0.1'
     end
 
     def whitelisted_ip?(ip)

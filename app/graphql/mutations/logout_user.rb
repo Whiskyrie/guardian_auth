@@ -12,14 +12,6 @@ module Mutations
         return { success: false, message: "User not authenticated" }
       end
 
-      # If no token in context, try to extract it directly from headers
-      unless current_token
-        authorization_header = context[:request]&.headers&.[]('Authorization')
-        if authorization_header&.match(/^Bearer\s+(.+)$/i)
-          current_token = authorization_header.match(/^Bearer\s+(.+)$/i)[1]
-        end
-      end
-
       unless current_token
         return { success: false, message: "No token found" }
       end

@@ -21,10 +21,9 @@ class GraphqlController < ApplicationController
     context = {
       current_user: current_user,
       current_token: token,
-      request: request,
-      pundit: pundit_user,
-      ip_address: request.remote_ip,
-      user_agent: request.user_agent
+      remote_ip: request.remote_ip,
+      user_agent: request.user_agent,
+      pundit: pundit_user
     }
 
     # Start timing

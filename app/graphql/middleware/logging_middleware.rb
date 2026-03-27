@@ -111,15 +111,11 @@ module GraphQL
       # Add safe user information if available
       if context[:current_user]
         sanitized[:user_id] = context[:current_user].id
-        sanitized[:user_email] = context[:current_user].email
       end
 
-      # Add request information without sensitive headers
-      if context[:request]
-        sanitized[:request_ip] = context[:request].remote_ip
-        sanitized[:user_agent] = context[:request].user_agent
-        sanitized[:request_method] = context[:request].method
-      end
+      # Add request information
+      sanitized[:request_ip] = context[:remote_ip] if context[:remote_ip]
+      sanitized[:user_agent] = context[:user_agent] if context[:user_agent]
 
       sanitized
     end

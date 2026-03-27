@@ -11,7 +11,6 @@ module Authentication
 
     # Store token for later use (logout operations)
     @current_token = token
-    Rails.logger.info "Token extracted and stored: #{token[0..20]}..." if token
 
     # Check if token is valid (includes blacklist check)
     return nil unless JwtService.valid_token?(token)
@@ -65,7 +64,6 @@ module Authentication
   def extract_token_from_header
     return nil unless authorization_header
 
-    Rails.logger.info "Authorization header: #{authorization_header}"
     # Expected format: "Bearer <token>"
     token_match = authorization_header.match(/^Bearer\s+(.+)$/i)
     extracted_token = token_match&.[](1)

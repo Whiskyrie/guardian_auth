@@ -159,11 +159,11 @@ class GraphqlLogger
   private
 
   def extract_ip(context)
-    context[:request]&.remote_ip || context[:ip_address]
+    context[:remote_ip]
   end
 
   def extract_user_agent(context)
-    context[:request]&.user_agent || context[:user_agent]
+    context[:user_agent]
   end
 
   def extract_error_code(error)

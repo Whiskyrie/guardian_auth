@@ -4,8 +4,7 @@ module GraphqlHelpers
     context = {
       current_user: user,
       current_token: token,
-      request: double('request', remote_ip: ip, headers: {}, user_agent: 'RSpec'),
-      ip_address: ip,
+      remote_ip: ip,
       user_agent: 'RSpec'
     }
 

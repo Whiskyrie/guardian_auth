@@ -41,10 +41,11 @@ module Tracers
     private
 
     def self.log_query_performance(query:, duration:, variables:, operation_name:)
+      sanitized = sanitize_query(query)
       Rails.logger.info({
         event: 'graphql_query_performance',
         duration_ms: (duration * 1000).round(2),
-        query: query&.gsub(/\s+/, ' ')&.strip,
+        query: sanitized&.gsub(/\s+/, ' ')&.strip,
         operation_name: operation_name,
         variables: variables&.keys,
         timestamp: Time.current.iso8601
@@ -56,10 +57,17 @@ module Tracers
       Rails.logger.warn({
         event: 'slow_graphql_query',
         duration_ms: (duration * 1000).round(2),
-        query: query,
+        query: sanitized,
         operation_name: operation_name,
         timestamp: Time.current.iso8601
       }.to_json)
+    end
+
+    def self.sanitize_query(query)
+      return nil if query.nil?
+
+      # Replace all string literal values with [REDACTED] to prevent PII leakage
+      query.gsub(/"[^"]*"/, '"[REDACTED]"').gsub(/'[^']*'/, "'[REDACTED]'")
     end
 
     def self.log_slow_field(field:, duration:, path:)
