@@ -1,10 +1,9 @@
 module Analyzers
-  class QueryComplexityAnalyzer < GraphQL::Analysis::AST::Analyzer
+  class QueryComplexityAnalyzer < GraphQL::Analysis::Analyzer
     def initialize(query)
       super
       @complexity = 0
       @max_complexity = query.schema.max_complexity || 200
-      @query = query
     end
 
     def on_enter_field(node, parent, visitor)
@@ -23,7 +22,7 @@ module Analyzers
         field: field_definition.graphql_name,
         complexity: field_complexity,
         total_complexity: @complexity,
-        query: @query.query_string&.gsub(/\s+/, ' ')&.strip
+        query: visitor.query.query_string&.gsub(/\s+/, ' ')&.strip
       }.to_json)
     end
 
@@ -38,7 +37,7 @@ module Analyzers
           event: 'graphql_query_complexity',
           complexity: @complexity,
           max_complexity: @max_complexity,
-          query: @query.query_string&.gsub(/\s+/, ' ')&.strip
+          query: subject.query_string&.gsub(/\s+/, ' ')&.strip
         }.to_json)
 
         nil
