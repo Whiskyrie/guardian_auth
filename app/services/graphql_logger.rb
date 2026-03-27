@@ -120,7 +120,7 @@ class GraphqlLogger
     log_data = {
       event: 'graphql_authorization_failure',
       user_id: user&.id,
-      user_role: user&.role,
+      user_role: user&.primary_role,
       action: action,
       resource_type: resource.class.name,
       resource_id: resource.respond_to?(:id) ? resource.id : nil,

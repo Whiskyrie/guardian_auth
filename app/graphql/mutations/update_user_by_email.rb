@@ -23,12 +23,18 @@ module Mutations
       return role_validation if role_validation
 
       update_attrs = input.to_h.compact
+      requested_role = update_attrs.delete(:role)
 
-      if user.update(update_attrs)
-        { user: user, errors: [] }
-      else
-        { user: nil, errors: format_model_errors(user) }
+      begin
+        ActiveRecord::Base.transaction do
+          user.update!(update_attrs)
+          apply_role_change!(user, requested_role) if requested_role.present?
+        end
+      rescue ActiveRecord::RecordInvalid => e
+        return { user: nil, errors: format_model_errors(e.record) }
       end
+
+      { user: user.reload, errors: [] }
     end
 
     private
@@ -42,11 +48,24 @@ module Mutations
                                     'Only administrators can change user roles') }
       end
 
-      unless User::VALID_ROLES.include?(input[:role])
-        return { user: nil, errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, "Invalid role. Must be one of: #{User::VALID_ROLES.join(', ')}") }
+      unless Role.exists?(name: input[:role])
+        return { user: nil,
+                 errors: auth_error(Errors::ErrorCodes::INVALID_INPUT,
+                                    "Role '#{input[:role]}' is not configured in the system") }
       end
 
       nil
+    end
+
+    def apply_role_change!(user, role_name)
+      role = Role.find_by(name: role_name)
+      return unless role
+
+      user.user_roles.where.not(role_id: role.id).destroy_all
+      user.user_roles.find_or_create_by!(role: role) do |user_role|
+        user_role.granted_by = current_user
+        user_role.granted_at = Time.current
+      end
     end
   end
 end

@@ -3,8 +3,6 @@ class User < ApplicationRecord
   has_secure_password
 
   # Constants
-  # Legacy constant - keeping for backwards compatibility
-  VALID_ROLES = %w[user admin].freeze
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
 
   # Strong password requirements: min 8 chars, at least one uppercase, lowercase, digit, and special char
@@ -53,9 +51,6 @@ class User < ApplicationRecord
               with: /\A[a-zA-ZÀ-ÿ\s'-]+\z/,
               message: 'deve conter apenas letras, espaços, hífens e apostrofes'
             }
-
-  # Removed old role validation - now using RBAC system
-  # validates :role, inclusion: { in: VALID_ROLES }
 
   # Custom validation for password strength
   validate :password_not_similar_to_user_info, if: -> { password.present? }

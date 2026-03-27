@@ -42,7 +42,7 @@ module Mutations
         # Generate JWT token
         token = JwtService.encode(
           user_id: user.id,
-          role: user.role
+          role: user.primary_role
         )
 
         # Log successful login

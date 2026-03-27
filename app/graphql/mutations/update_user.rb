@@ -28,27 +28,23 @@ module Mutations
       return profile_validation if profile_validation
 
       update_attrs = input.to_h.compact
+      requested_role = update_attrs.delete(:role)
 
-      if user.update(update_attrs)
-        # Rastrear atualização de perfil se houve mudanças relevantes
-        profile_fields = %w[email first_name last_name]
-        profile_changes = update_attrs.keys.map(&:to_s) & profile_fields
-
-        if profile_changes.any? && !current_user&.admin?
-          # Verificar se realmente houve mudanças nos valores
-          has_real_changes = profile_changes.any? do |field|
-            user.public_send("#{field}_previously_was") != user.public_send(field.to_sym)
-          end
-
-          if has_real_changes
-            user.track_profile_update!
-          end
+      begin
+        ActiveRecord::Base.transaction do
+          user.update!(update_attrs)
+          apply_role_change!(user, requested_role) if requested_role.present?
         end
-
-        { user: user, errors: [] }
-      else
-        { user: nil, errors: format_model_errors(user) }
+      rescue ActiveRecord::RecordInvalid => e
+        return { user: nil, errors: format_model_errors(e.record) }
       end
+
+      # Rastrear atualização de perfil se houve mudanças relevantes
+      profile_fields = %w[email first_name last_name]
+      profile_changes = user.previous_changes.keys & profile_fields
+      user.track_profile_update! if profile_changes.any? && !current_user&.admin?
+
+      { user: user.reload, errors: [] }
     end
 
     private
@@ -62,11 +58,24 @@ module Mutations
                                     'Only administrators can change user roles') }
       end
 
-      unless User::VALID_ROLES.include?(input[:role])
-        return { user: nil, errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, "Invalid role. Must be one of: #{User::VALID_ROLES.join(', ')}") }
+      unless Role.exists?(name: input[:role])
+        return { user: nil,
+                 errors: auth_error(Errors::ErrorCodes::INVALID_INPUT,
+                                    "Role '#{input[:role]}' is not configured in the system") }
       end
 
       nil
+    end
+
+    def apply_role_change!(user, role_name)
+      role = Role.find_by(name: role_name)
+      return unless role
+
+      user.user_roles.where.not(role_id: role.id).destroy_all
+      user.user_roles.find_or_create_by!(role: role) do |user_role|
+        user_role.granted_by = current_user
+        user_role.granted_at = Time.current
+      end
     end
 
     def validate_profile_update_frequency(user, input)
