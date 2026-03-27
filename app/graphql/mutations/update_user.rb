@@ -9,8 +9,9 @@ module Mutations
     field :errors, [Types::UserErrorType], null: false
 
     def resolve(id:, input:)
-      # Buscar o usuário pelo GlobalID
-      user = GlobalID.find(id)
+      # Buscar o usuário pelo GlobalID garantindo que o modelo seja User (evita IDOR via GlobalID de outros modelos)
+      gid = GlobalID.parse(id)
+      user = gid&.model_class == User ? User.find_by(id: gid.model_id) : nil
 
       unless user
         return { user: nil, errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found') }
