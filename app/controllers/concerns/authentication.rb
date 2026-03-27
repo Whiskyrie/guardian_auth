@@ -32,7 +32,7 @@ module Authentication
 
     # Log successful authentication for security monitoring
     SecurityLogger.log_login_attempt(
-      email: user.email,
+      user_id: user.id,
       ip: request.remote_ip,
       user_agent: request.user_agent,
       success: true

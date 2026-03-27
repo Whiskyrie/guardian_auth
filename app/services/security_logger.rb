@@ -13,9 +13,9 @@ class SecurityLogger
     end
   end
 
-  def self.log_login_attempt(email:, ip:, user_agent:, success:, failure_reason: nil)
+  def self.log_login_attempt(ip:, user_agent:, success:, user_id: nil, failure_reason: nil)
     instance.log_login_attempt(
-      email: email,
+      user_id: user_id,
       ip: ip,
       user_agent: user_agent,
       success: success,
@@ -48,10 +48,10 @@ class SecurityLogger
     )
   end
 
-  def log_login_attempt(email:, ip:, user_agent:, success:, failure_reason: nil)
+  def log_login_attempt(ip:, user_agent:, success:, user_id: nil, failure_reason: nil)
     message = {
       event: 'login_attempt',
-      email: email,
+      user_id: user_id,
       ip: ip,
       user_agent: user_agent,
       success: success,

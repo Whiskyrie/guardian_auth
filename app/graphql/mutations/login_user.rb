@@ -19,9 +19,9 @@ module Mutations
       # Basic input validation
       if email.blank? || password.blank?
         SecurityLogger.log_login_attempt(
-          email: email,
-          ip: context[:request]&.remote_ip,
-          user_agent: context[:request]&.user_agent,
+          user_id: nil,
+          ip: context[:remote_ip],
+          user_agent: context[:user_agent],
           success: false,
           failure_reason: 'empty_credentials'
         )
@@ -47,9 +47,9 @@ module Mutations
 
         # Log successful login
         AuditLogger.log_login(
-          email: email,
-          ip: context[:request]&.remote_ip,
-          user_agent: context[:request]&.user_agent,
+          user_id: user.id,
+          ip: context[:remote_ip],
+          user_agent: context[:user_agent],
           success: true,
           user: user
         )
@@ -64,9 +64,9 @@ module Mutations
         failure_reason = user ? 'invalid_password' : 'user_not_found'
 
         AuditLogger.log_login(
-          email: email,
-          ip: context[:request]&.remote_ip,
-          user_agent: context[:request]&.user_agent,
+          user_id: user&.id,
+          ip: context[:remote_ip],
+          user_agent: context[:user_agent],
           success: false,
           user: user,
           failure_reason: failure_reason
@@ -87,10 +87,9 @@ module Mutations
         action: 'login_error',
         resource: 'User',
         metadata: {
-          ip_address: context[:request]&.remote_ip,
-          user_agent: context[:request]&.user_agent,
+          ip_address: context[:remote_ip],
+          user_agent: context[:user_agent],
           error: e.message,
-          email: email,
           activity: 'login_mutation_error'
         },
         result: 'failure'

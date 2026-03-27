@@ -6,12 +6,12 @@ class AuditLogger
   end
 
   # Log authentication actions
-  def self.log_login(email:, ip:, user_agent:, success:, user: nil, failure_reason: nil)
+  def self.log_login(ip:, user_agent:, success:, user_id: nil, user: nil, failure_reason: nil)
     metadata = build_metadata(
       ip: ip,
       user_agent: user_agent,
       failure_reason: failure_reason,
-      email: email
+      user_id: user_id
     )
 
     instance.log(
