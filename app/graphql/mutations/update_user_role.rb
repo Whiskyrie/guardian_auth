@@ -67,12 +67,21 @@ module Mutations
         message: "User roles updated successfully",
         errors: []
       }
-    rescue StandardError => e
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error "UpdateUserRole persistence error: #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
       {
         user: nil,
         success: false,
-        message: "An error occurred while updating user roles",
-        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, e.message)
+        message: 'Failed to update user roles due to a validation error',
+        errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, 'Role assignment failed due to a validation error')
+      }
+    rescue StandardError => e
+      Rails.logger.error "UpdateUserRole error: #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
+      {
+        user: nil,
+        success: false,
+        message: 'An error occurred while updating user roles',
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'An internal error occurred while updating user roles')
       }
     end
 

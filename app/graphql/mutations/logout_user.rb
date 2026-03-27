@@ -36,10 +36,10 @@ module Mutations
         message: "Successfully logged out"
       }
     rescue StandardError => e
-      Rails.logger.error "Logout error: #{e.message}"
+      Rails.logger.error "Logout error: #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
       {
         success: false,
-        message: "Logout failed: #{e.message}"
+        message: 'Logout failed due to an internal error. Please try again.'
       }
     end
   end

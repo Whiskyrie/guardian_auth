@@ -39,7 +39,8 @@ module Mutations
           errors: format_model_errors(user)
         }
       end
-    rescue StandardError
+    rescue StandardError => e
+      Rails.logger.error "ChangePassword error: #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
       {
         user: nil,
         errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Password change failed. Please try again.')

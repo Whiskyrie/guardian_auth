@@ -39,10 +39,11 @@ module Mutations
         }
       end
     rescue StandardError => e
+      Rails.logger.error "DeleteUser error: #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
       {
         success: false,
-        message: "An error occurred while deleting the user",
-        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, e.message)
+        message: 'An error occurred while deleting the user',
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'An internal error occurred while deleting the user')
       }
     end
 
