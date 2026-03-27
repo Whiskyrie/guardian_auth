@@ -21,7 +21,7 @@ class GuardianAuthSchema < GraphQL::Schema
   max_depth 10               # Reduzido para melhor segurança
   max_complexity 200         # Reduzido para melhor performance
   max_query_string_tokens(5000)
-  validate_max_errors(100)
+  validate_max_errors(5)
 
   # Configurar introspection baseado no ambiente
   if Rails.env.production?
@@ -32,8 +32,6 @@ class GuardianAuthSchema < GraphQL::Schema
   end
 
   # Add query analyzers for security and performance
-  query_analyzer(GraphQL::Analysis::AST::MaxQueryDepth)
-  query_analyzer(GraphQL::Analysis::AST::MaxQueryComplexity)
   query_analyzer(Analyzers::QueryComplexityAnalyzer)
 
   # Configure error handling with detailed logging and user-friendly messages
@@ -170,7 +168,7 @@ class GuardianAuthSchema < GraphQL::Schema
   max_query_string_tokens(5000)
 
   # Stop validating when it encounters this many errors:
-  validate_max_errors(100)
+  validate_max_errors(5)
 
   # Relay-style Object Identification:
 
