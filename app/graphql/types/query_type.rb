@@ -48,6 +48,16 @@ module Types
                         description: 'O ID do usuário a ser buscado'
     end
 
+    def user(id:)
+      authenticate!
+
+      user = User.find_by(id: id)
+      return nil unless user
+
+      authorize!(user, :show?)
+      user
+    end
+
     # Audit logs (admin only)
     field :audit_logs, resolver: Resolvers::AuditLogsResolver,
                        max_page_size: 100, # Allow larger page size for audit logs

@@ -2,11 +2,14 @@ module Types
   class UserType < Types::BaseObject
     description "Representa um usuário do sistema Guardian Auth"
 
+    ALLOWED_ROLE_VALUES = Types::UserRoleEnum.values.values.map(&:value).freeze
+
     field :id, ID, null: false, description: "Identificador único do usuário"
     field :email, String, null: false, description: "Endereço de email do usuário (único no sistema)"
     field :first_name, String, null: true, description: "Primeiro nome do usuário"
     field :last_name, String, null: true, description: "Sobrenome do usuário"
-    field :role, String, null: true, description: "Papel/função do usuário no sistema (admin, user, etc.)"
+    field :role, Types::UserRoleEnum, null: true, description: "Papel/função primário do usuário"
+    field :roles, [Types::UserRoleEnum], null: true, description: "Lista de papéis/funções do usuário"
     field :last_login_at, GraphQL::Types::ISO8601DateTime, null: true,
                                                            description: "Data e hora do último login do usuário"
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false,
@@ -26,6 +29,15 @@ module Types
 
     def display_name
       object.display_name
+    end
+
+    def role
+      role_name = object.primary_role
+      ALLOWED_ROLE_VALUES.include?(role_name) ? role_name : nil
+    end
+
+    def roles
+      object.role_names.select { |role_name| ALLOWED_ROLE_VALUES.include?(role_name) }
     end
   end
 end

@@ -11,7 +11,7 @@ module Types
     argument :email, String, required: false,
                              description: "Endereço de email do usuário (deve ser único no sistema)"
 
-    argument :role, String, required: false,
-                            description: "Papel/função do usuário no sistema (apenas administradores podem alterar)"
+    argument :role, Types::UserRoleEnum, required: false,
+                                         description: "Papel/função do usuário no sistema (apenas administradores podem alterar)"
   end
 end
