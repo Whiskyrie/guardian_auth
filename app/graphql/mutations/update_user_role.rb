@@ -4,7 +4,7 @@ module Mutations
     description "Update user roles (admin only)"
 
     argument :user_id, ID, required: true, description: "ID of the user to update"
-    argument :role_names, [String], required: true, description: "List of role names to assign"
+    argument :role_names, [Types::UserRoleEnum], required: true, description: "List of role names to assign"
 
     field :user, Types::UserType, null: true, description: "Updated user"
     field :success, Boolean, null: false, description: "Whether the operation was successful"
@@ -36,8 +36,9 @@ module Mutations
         }
       end
 
-      # Validate that all roles exist
-      invalid_roles = role_names - Role.pluck(:name)
+      # Validate that all roles exist with a targeted query (avoids loading all roles into memory)
+      found_names = Role.where(name: role_names).pluck(:name)
+      invalid_roles = role_names - found_names
       if invalid_roles.any?
         return {
           user: nil,
@@ -47,11 +48,17 @@ module Mutations
         }
       end
 
-      # Clear existing roles and assign new ones
-      user.user_roles.destroy_all
+      # Atomic role assignment: all roles applied or none (full rollback on any failure)
+      ActiveRecord::Base.transaction do
+        user.user_roles.destroy_all
 
-      role_names.each do |role_name|
-        user.assign_role(role_name, granted_by: current_user)
+        Role.where(name: role_names).each do |role|
+          user.user_roles.create!(
+            role: role,
+            granted_by: current_user,
+            granted_at: Time.current
+          )
+        end
       end
 
       {
