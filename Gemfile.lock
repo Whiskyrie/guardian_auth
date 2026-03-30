@@ -74,7 +74,7 @@ GEM
       uri (>= 0.13.1)
     ast (2.4.3)
     base64 (0.3.0)
-    bcrypt (3.1.20)
+    bcrypt (3.1.22)
     bcrypt_pbkdf (1.1.1)
     benchmark (0.5.0)
     bigdecimal (3.3.1)
@@ -118,7 +118,7 @@ GEM
       activesupport (>= 6.1)
     graphiql-rails (1.10.5)
       railties
-    graphql (2.5.14)
+    graphql (2.5.22)
       base64
       fiber-storage
       logger
@@ -196,11 +196,11 @@ GEM
     parser (3.3.9.0)
       ast (~> 2.4.1)
       racc
-    pg (1.6.2)
-    pg (1.6.2-aarch64-linux)
-    pg (1.6.2-aarch64-linux-musl)
-    pg (1.6.2-x86_64-linux)
-    pg (1.6.2-x86_64-linux-musl)
+    pg (1.6.3)
+    pg (1.6.3-aarch64-linux)
+    pg (1.6.3-aarch64-linux-musl)
+    pg (1.6.3-x86_64-linux)
+    pg (1.6.3-x86_64-linux-musl)
     pp (0.6.3)
       prettyprint
     prettyprint (0.2.0)
@@ -264,8 +264,10 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.1)
-    rbs (3.9.5)
+    rbs (4.0.2)
       logger
+      prism (>= 1.6.0)
+      tsort
     rdoc (6.17.0)
       erb
       psych (>= 4.0.0)
@@ -325,7 +327,7 @@ GEM
     rubocop-rspec (3.9.0)
       lint_roller (~> 1.1)
       rubocop (~> 1.81)
-    ruby-lsp (0.26.4)
+    ruby-lsp (0.26.9)
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)
@@ -364,9 +366,9 @@ GEM
       ostruct
     stringio (3.1.9)
     thor (1.4.0)
-    thruster (0.1.16)
-    thruster (0.1.16-aarch64-linux)
-    thruster (0.1.16-x86_64-linux)
+    thruster (0.1.20)
+    thruster (0.1.20-aarch64-linux)
+    thruster (0.1.20-x86_64-linux)
     timeout (0.5.0)
     tsort (0.2.0)
     tzinfo (2.0.6)
