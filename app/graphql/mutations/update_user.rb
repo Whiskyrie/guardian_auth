@@ -119,8 +119,11 @@ module Mutations
           success: false,
           message: 'Profile update cooldown active',
           user: nil,
-          errors: auth_error(Errors::ErrorCodes::VALIDATION_FAILED,
-                             "You can only update your profile once every 7 days. Please wait #{days_remaining} day(s).")
+          errors: auth_error(
+            Errors::ErrorCodes::VALIDATION_FAILED,
+            "You can only update your profile once every 7 days. " \
+            "Please wait #{days_remaining} day(s)."
+          )
         }
       end
 

@@ -36,7 +36,10 @@ module Mutations
       {
         success: false,
         message: 'Logout failed due to an internal error. Please try again.',
-        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Logout failed due to an internal error. Please try again.')
+        errors: auth_error(
+          Errors::ErrorCodes::INTERNAL_ERROR,
+          'Logout failed due to an internal error. Please try again.'
+        )
       }
     end
   end

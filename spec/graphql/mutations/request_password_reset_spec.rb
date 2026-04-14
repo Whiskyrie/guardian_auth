@@ -34,9 +34,9 @@ RSpec.describe 'RequestPasswordReset mutation', type: :graphql do
     end
 
     it 'creates a password reset token for the user' do
-      expect {
+      expect do
         run_mutation
-      }.to change { user.password_reset_tokens.count }.by(1)
+      end.to change { user.password_reset_tokens.count }.by(1)
     end
   end
 
@@ -50,9 +50,9 @@ RSpec.describe 'RequestPasswordReset mutation', type: :graphql do
     end
 
     it 'does not create any password reset tokens' do
-      expect {
+      expect do
         run_mutation(email: 'nonexistent@example.com')
-      }.not_to change(PasswordResetToken, :count)
+      end.not_to change(PasswordResetToken, :count)
     end
   end
 

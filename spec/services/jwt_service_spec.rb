@@ -120,9 +120,9 @@ RSpec.describe JwtService, type: :service do
   describe '.blacklist_token!' do
     it 'creates a TokenBlacklist record' do
       token = JwtService.encode(user_id: user.id)
-      expect {
+      expect do
         JwtService.blacklist_token!(token, user.id)
-      }.to change(TokenBlacklist, :count).by(1)
+      end.to change(TokenBlacklist, :count).by(1)
     end
 
     it 'handles duplicate gracefully by returning true' do

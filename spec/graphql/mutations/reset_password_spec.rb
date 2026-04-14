@@ -101,9 +101,9 @@ RSpec.describe 'ResetPassword mutation', type: :graphql do
   describe 'successful reset invalidates existing sessions' do
     it 'updates tokens_valid_after on the user' do
       raw_token = generate_reset_token(for_user: user)
-      expect {
+      expect do
         run_mutation(token: raw_token, new_password: 'NewSecure1@')
-      }.to change { user.reload.tokens_valid_after }.from(nil)
+      end.to change { user.reload.tokens_valid_after }.from(nil)
     end
   end
 end

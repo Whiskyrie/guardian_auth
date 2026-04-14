@@ -4,7 +4,7 @@ module Types
   # Struct de valor para carregar dados de erro antes da serialização GraphQL.
   # Permite que helpers como `format_model_errors` e `auth_error` retornem objetos
   # com métodos em vez de hashes simples, garantindo resolução correta pelos campos GraphQL.
-  UserError = Struct.new(:message, :code, :field, keyword_init: true)
+  UserError = Struct.new(:message, :code, :field)
 
   class UserErrorType < Types::BaseObject
     description 'Erro estruturado com código e campo para identificação programática'

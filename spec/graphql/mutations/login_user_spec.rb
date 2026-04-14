@@ -38,9 +38,9 @@ RSpec.describe 'LoginUser mutation', type: :graphql do
     end
 
     it 'updates last_login_at' do
-      expect {
+      expect do
         run_mutation
-      }.to change { user.reload.last_login_at }.from(nil)
+      end.to change { user.reload.last_login_at }.from(nil)
     end
   end
 

@@ -68,7 +68,8 @@ module Mutations
         errors: []
       }
     rescue ActiveRecord::RecordInvalid => e
-      Rails.logger.error "UpdateUserRole persistence error: #{e.class}: #{e.message}\n#{e.backtrace&.first(5)&.join("\n")}"
+      Rails.logger.error "UpdateUserRole persistence error: #{e.class}: #{e.message}\n" \
+                         "#{e.backtrace&.first(5)&.join("\n")}"
       {
         user: nil,
         success: false,

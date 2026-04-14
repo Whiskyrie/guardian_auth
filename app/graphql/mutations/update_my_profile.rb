@@ -18,7 +18,10 @@ module Mutations
           success: false,
           message: 'Cannot change your own role',
           user: nil,
-          errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS, 'Cannot change your own role. Contact an administrator.')
+          errors: auth_error(
+            Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
+            'Cannot change your own role. Contact an administrator.'
+          )
         }
       end
 

@@ -37,7 +37,11 @@ RSpec.describe PasswordResetToken, type: :model do
 
     let!(:active_token) { create(:password_reset_token, user: user, used: false, expires_at: 1.hour.from_now) }
     let!(:expired_token) { create(:password_reset_token, user: user, used: false, expires_at: 1.hour.ago) }
-    let!(:used_token) { create(:password_reset_token, user: user, used: true, expires_at: 1.hour.from_now, used_at: 1.minute.ago) }
+    let!(:used_token) do
+      create(:password_reset_token,
+             user: user, used: true,
+             expires_at: 1.hour.from_now, used_at: 1.minute.ago)
+    end
 
     describe '.active' do
       it 'returns unused tokens that have not expired' do

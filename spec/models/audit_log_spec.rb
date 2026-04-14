@@ -109,9 +109,9 @@ RSpec.describe AuditLog, type: :model do
   describe '.log_action' do
     it 'creates an audit log entry' do
       user = create(:user)
-      expect {
+      expect do
         AuditLog.log_action(action: 'register', resource: 'User', user: user, result: 'success')
-      }.to change(AuditLog, :count).by(1)
+      end.to change(AuditLog, :count).by(1)
     end
   end
 end

@@ -6,7 +6,9 @@ module Mutations
     rate_limited 'registerUser'
 
     argument :email, String, required: true, description: "User's email address"
-    argument :password, String, required: true, description: "User's password (minimum 8 characters, must include uppercase, lowercase, digit, and special character)"
+    argument :password, String, required: true,
+                                description: "Min 8 chars, must include " \
+                                             "uppercase, lowercase, digit, and special char"
     argument :first_name, String, required: true, description: "User's first name"
     argument :last_name, String, required: true, description: "User's last name"
 

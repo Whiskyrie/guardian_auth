@@ -6,7 +6,9 @@ module Mutations
     rate_limited 'resetPassword'
 
     argument :token, String, required: true, description: 'Password reset token'
-    argument :new_password, String, required: true, description: 'New password (minimum 8 characters, must include uppercase, lowercase, digit, and special character)'
+    argument :new_password, String, required: true,
+                                    description: 'Min 8 chars, must include ' \
+                                                 'uppercase, lowercase, digit, and special char'
 
     field :success, Boolean, null: false, description: 'Whether the password was reset successfully'
     field :message, String, null: true, description: 'Result message'

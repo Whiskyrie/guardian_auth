@@ -13,9 +13,6 @@ module GuardianAuth
     config.load_defaults 8.0
     config.api_only = true
 
-    # Middleware configuration
-    config.autoload_paths << Rails.root.join('app', 'middleware')
-    
     # Security headers middleware
     config.middleware.use SecurityHeadersMiddleware
     
