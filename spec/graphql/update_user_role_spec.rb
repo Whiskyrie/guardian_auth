@@ -70,7 +70,7 @@ RSpec.describe 'UpdateUserRole mutation', type: :graphql do
       call_count = 0
       allow_any_instance_of(UserRole).to receive(:save!).and_wrap_original do |method|
         call_count += 1
-        raise ActiveRecord::RecordInvalid.new(method.receiver) if call_count >= 2
+        raise ActiveRecord::RecordInvalid, method.receiver if call_count >= 2
 
         method.call
       end

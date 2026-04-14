@@ -52,7 +52,7 @@ module Mutations
 
       # Generate reset token
       begin
-        raw_token = PasswordResetToken.create_for_user(
+        PasswordResetToken.create_for_user(
           user,
           ip_address: context[:remote_ip],
           user_agent: context[:user_agent]

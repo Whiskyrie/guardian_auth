@@ -85,9 +85,9 @@ RSpec.describe User, type: :model do
         User::WEAK_PASSWORDS.each do |weak|
           # Append special char and digit if not present to isolate the weak-password check
           pw = weak.match?(/[@$!%*?&]/) ? weak : "#{weak}@"
-          pw = pw.match?(/\d/) ? pw : "#{pw}1"
-          pw = pw.match?(/[A-Z]/) ? pw : "A#{pw}"
-          pw = pw.match?(/[a-z]/) ? pw : "#{pw}a"
+          pw = "#{pw}1" unless pw.match?(/\d/)
+          pw = "A#{pw}" unless pw.match?(/[A-Z]/)
+          pw = "#{pw}a" unless pw.match?(/[a-z]/)
           user = build(:user, password: pw, password_confirmation: pw)
           expect(user).not_to be_valid
           expect(user.errors[:password]).to include('is too common and easy to guess. Choose a more secure password.')
