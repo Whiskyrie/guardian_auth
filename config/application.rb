@@ -26,16 +26,11 @@ module GuardianAuth
     config.middleware.insert_before 0, Rack::Cors do
       allow do
         origins do |source, env|
-          # Allow requests from same origin and specific domains in production
           if Rails.env.development?
             true
           else
-            # Add your frontend domains here
-            %w[
-              https://yourapp.com
-              https://www.yourapp.com
-              https://app.yourapp.com
-            ].include?(source)
+            allowed_origins = ENV.fetch('ALLOWED_ORIGINS', '').split(',').map(&:strip).reject(&:blank?)
+            allowed_origins.include?(source)
           end
         end
         
