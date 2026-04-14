@@ -8,6 +8,8 @@ module Mutations
     argument :email, String, required: true, description: "User's email address"
     argument :password, String, required: true, description: "User's password"
 
+    field :success, Boolean, null: false, description: 'Whether the login was successful'
+    field :message, String, null: true, description: 'Result message'
     field :token, String, null: true, description: 'JWT authentication token'
     field :user, Types::UserType, null: true, description: 'Authenticated user object'
     field :errors, [Types::UserErrorType], null: false, description: 'List of authentication errors'
@@ -27,9 +29,11 @@ module Mutations
         )
 
         return {
+          success: false,
+          message: 'Email and password are required',
           token: nil,
           user: nil,
-          errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, 'Email e senha são obrigatórios')
+          errors: auth_error(Errors::ErrorCodes::INVALID_INPUT, 'Email and password are required')
         }
       end
 
@@ -55,6 +59,8 @@ module Mutations
         )
 
         {
+          success: true,
+          message: 'Login successful',
           token: token,
           user: user,
           errors: []
@@ -74,9 +80,11 @@ module Mutations
 
         # Generic error message to prevent user enumeration
         {
+          success: false,
+          message: 'Invalid credentials',
           token: nil,
           user: nil,
-          errors: auth_error(Errors::ErrorCodes::INVALID_CREDENTIALS, 'Email ou senha inválidos!')
+          errors: auth_error(Errors::ErrorCodes::INVALID_CREDENTIALS, 'Invalid email or password')
         }
       end
     rescue StandardError => e
@@ -96,9 +104,11 @@ module Mutations
       )
 
       {
+        success: false,
+        message: 'Authentication failed. Please try again.',
         token: nil,
         user: nil,
-        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Falha na autenticação. Tente novamente.')
+        errors: auth_error(Errors::ErrorCodes::INTERNAL_ERROR, 'Authentication failed. Please try again.')
       }
     end
   end

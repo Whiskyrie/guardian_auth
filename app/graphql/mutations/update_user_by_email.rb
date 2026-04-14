@@ -5,6 +5,8 @@ module Mutations
     argument :email, String, description: 'Email of user to update'
     argument :input, Types::UserInputType, description: 'User fields to update'
 
+    field :success, Boolean, null: false, description: 'Whether the update was successful'
+    field :message, String, null: true, description: 'Result message'
     field :user, Types::UserType, null: true
     field :errors, [Types::UserErrorType], null: false
 
@@ -13,7 +15,12 @@ module Mutations
       user = User.find_by_email(email)
 
       unless user
-        return { user: nil, errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found') }
+        return {
+          success: false,
+          message: 'User not found',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found')
+        }
       end
 
       # Verificar autorização usando Pundit
@@ -31,10 +38,10 @@ module Mutations
           apply_role_change!(user, requested_role) if requested_role.present?
         end
       rescue ActiveRecord::RecordInvalid => e
-        return { user: nil, errors: format_model_errors(e.record) }
+        return { success: false, message: 'Update failed', user: nil, errors: format_model_errors(e.record) }
       end
 
-      { user: user.reload, errors: [] }
+      { success: true, message: 'User updated successfully', user: user.reload, errors: [] }
     end
 
     private
@@ -43,15 +50,23 @@ module Mutations
       return unless input[:role].present?
 
       unless current_user&.admin?
-        return { user: nil,
-                 errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
-                                    'Only administrators can change user roles') }
+        return {
+          success: false,
+          message: 'Only administrators can change user roles',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
+                             'Only administrators can change user roles')
+        }
       end
 
       unless Role.exists?(name: input[:role])
-        return { user: nil,
-                 errors: auth_error(Errors::ErrorCodes::INVALID_INPUT,
-                                    "Role '#{input[:role]}' is not configured in the system") }
+        return {
+          success: false,
+          message: 'Role not found',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::INVALID_INPUT,
+                             "Role '#{input[:role]}' is not configured in the system")
+        }
       end
 
       nil

@@ -27,7 +27,7 @@ class User < ApplicationRecord
             uniqueness: { case_sensitive: false },
             format: {
               with: EMAIL_REGEX,
-              message: 'deve ter um formato válido'
+              message: 'must be a valid email format'
             },
             length: { maximum: 255 }
 
@@ -35,13 +35,13 @@ class User < ApplicationRecord
             length: { minimum: 8, maximum: 128 },
             format: {
               with: PASSWORD_REGEX,
-              message: 'deve conter pelo menos 8 caracteres, incluindo pelo menos ' \
-                       'uma letra maiúscula, uma minúscula, um número e um ' \
-                       'caractere especial (@$!%*?&)'
+              message: 'must be at least 8 characters, including at least ' \
+                       'one uppercase letter, one lowercase letter, one digit, and one ' \
+                       'special character (@$!%*?&)'
             },
             exclusion: {
               in: WEAK_PASSWORDS,
-              message: 'é muito comum e fácil de adivinhar. Escolha uma senha mais segura.'
+              message: 'is too common and easy to guess. Choose a more secure password.'
             },
             if: -> { new_record? || !password.nil? }
 
@@ -50,7 +50,7 @@ class User < ApplicationRecord
             length: { minimum: 2, maximum: 50 },
             format: {
               with: /\A[a-zA-ZÀ-ÿ\s'-]+\z/,
-              message: 'deve conter apenas letras, espaços, hífens e apostrofes'
+              message: 'must contain only letters, spaces, hyphens, and apostrophes'
             }
 
   # Custom validation for password strength
@@ -254,7 +254,7 @@ class User < ApplicationRecord
       next if info.length < 3
 
       if password_downcase.include?(info)
-        errors.add(:password, 'não deve conter informações pessoais como nome ou email')
+        errors.add(:password, 'must not contain personal information such as name or email')
         break
       end
     end

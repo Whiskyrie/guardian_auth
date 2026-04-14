@@ -137,8 +137,8 @@ mutation {
       firstName: "João",
       lastName: "Silva",
       email: "joao.silva@example.com",
-      password: "Senha123",
-      passwordConfirmation: "Senha123"
+      password: "SecureP@ss1",
+      passwordConfirmation: "SecureP@ss1"
     }
   ) {
     user {
@@ -158,7 +158,7 @@ mutation {
 mutation {
   loginUser(
     email: "joao.silva@example.com",
-    password: "Senha123"
+    password: "SecureP@ss1"
   ) {
     user {
       id
@@ -201,7 +201,7 @@ Authorization: Bearer <seu_token_jwt>
 ### Validações
 
 - **Email**: Deve ter formato válido e ser único
-- **Senha**: Mínimo de 8 caracteres, deve conter letras e números
+- **Senha**: Mínimo de 8 caracteres, deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&)
 - **Nome**: Obrigatório, entre 2 e 50 caracteres
 
 ## 🧪 Testes

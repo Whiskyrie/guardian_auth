@@ -5,6 +5,8 @@ module Mutations
 
     argument :token, String, required: true, description: 'Current JWT token (can be expired)'
 
+    field :success, Boolean, null: false, description: 'Whether the token refresh was successful'
+    field :message, String, null: true, description: 'Result message'
     field :token, String, null: true, description: 'New JWT authentication token'
     field :user, Types::UserType, null: true, description: 'Current user object'
     field :errors, [Types::UserErrorType], null: false, description: 'List of refresh errors'
@@ -86,6 +88,8 @@ module Mutations
 
       # Return success response
       {
+        success: true,
+        message: 'Token refreshed successfully',
         token: new_token,
         user: user,
         errors: []
@@ -102,6 +106,8 @@ module Mutations
 
     def error_response(message, code: Errors::ErrorCodes::INVALID_TOKEN)
       {
+        success: false,
+        message: message,
         token: nil,
         user: nil,
         errors: [Types::UserError.new(message: message, code: code, field: nil)]

@@ -5,16 +5,21 @@ module Mutations
     argument :id, ID, description: 'ID of user to update'
     argument :input, Types::UserInputType, description: 'User fields to update'
 
+    field :success, Boolean, null: false, description: 'Whether the update was successful'
+    field :message, String, null: true, description: 'Result message'
     field :user, Types::UserType, null: true
     field :errors, [Types::UserErrorType], null: false
 
     def resolve(id:, input:)
-      # Buscar o usuário pelo GlobalID garantindo que o modelo seja User (evita IDOR via GlobalID de outros modelos)
-      gid = GlobalID.parse(id)
-      user = gid&.model_class == User ? User.find_by(id: gid.model_id) : nil
+      user = User.find_by(id: id)
 
       unless user
-        return { user: nil, errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found') }
+        return {
+          success: false,
+          message: 'User not found',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::RESOURCE_NOT_FOUND, 'User not found')
+        }
       end
 
       # Verificar autorização usando Pundit
@@ -37,7 +42,7 @@ module Mutations
           apply_role_change!(user, requested_role) if requested_role.present?
         end
       rescue ActiveRecord::RecordInvalid => e
-        return { user: nil, errors: format_model_errors(e.record) }
+        return { success: false, message: 'Update failed', user: nil, errors: format_model_errors(e.record) }
       end
 
       # Rastrear atualização de perfil se houve mudanças relevantes
@@ -45,7 +50,7 @@ module Mutations
       profile_changes = user.previous_changes.keys & profile_fields
       user.track_profile_update! if profile_changes.any? && !current_user&.admin?
 
-      { user: user.reload, errors: [] }
+      { success: true, message: 'User updated successfully', user: user.reload, errors: [] }
     end
 
     private
@@ -54,15 +59,23 @@ module Mutations
       return unless input[:role].present?
 
       unless current_user&.admin?
-        return { user: nil,
-                 errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
-                                    'Only administrators can change user roles') }
+        return {
+          success: false,
+          message: 'Only administrators can change user roles',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS,
+                             'Only administrators can change user roles')
+        }
       end
 
       unless Role.exists?(name: input[:role])
-        return { user: nil,
-                 errors: auth_error(Errors::ErrorCodes::INVALID_INPUT,
-                                    "Role '#{input[:role]}' is not configured in the system") }
+        return {
+          success: false,
+          message: 'Role not found',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::INVALID_INPUT,
+                             "Role '#{input[:role]}' is not configured in the system")
+        }
       end
 
       nil
@@ -103,9 +116,11 @@ module Mutations
         days_since_update = ((Time.current - user.profile_updated_at) / 1.day).floor
         days_remaining = 7 - days_since_update
         return {
+          success: false,
+          message: 'Profile update cooldown active',
           user: nil,
           errors: auth_error(Errors::ErrorCodes::VALIDATION_FAILED,
-                             "Você só pode alterar seu perfil uma vez a cada 7 dias. Aguarde #{days_remaining} dia(s).")
+                             "You can only update your profile once every 7 days. Please wait #{days_remaining} day(s).")
         }
       end
 

@@ -4,6 +4,8 @@ module Mutations
 
     argument :input, Types::UserInputType, description: 'User fields to update'
 
+    field :success, Boolean, null: false, description: 'Whether the profile update was successful'
+    field :message, String, null: true, description: 'Result message'
     field :user, Types::UserType, null: true
     field :errors, [Types::UserErrorType], null: false
 
@@ -12,15 +14,20 @@ module Mutations
 
       # Não permitir alteração de role em perfil próprio
       if input[:role].present?
-        return { user: nil, errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS, 'Cannot change your own role. Contact an administrator.') }
+        return {
+          success: false,
+          message: 'Cannot change your own role',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::INSUFFICIENT_PERMISSIONS, 'Cannot change your own role. Contact an administrator.')
+        }
       end
 
       update_attrs = input.to_h.compact
 
       if current_user.update(update_attrs)
-        { user: current_user, errors: [] }
+        { success: true, message: 'Profile updated successfully', user: current_user, errors: [] }
       else
-        { user: nil, errors: format_model_errors(current_user) }
+        { success: false, message: 'Profile update failed', user: nil, errors: format_model_errors(current_user) }
       end
     end
   end
