@@ -22,6 +22,12 @@ module Types
     field :change_password, mutation: Mutations::ChangePassword,
                             description: "Altera a senha do usuário autenticado"
 
+    field :request_password_reset, mutation: Mutations::RequestPasswordReset,
+                                   description: "Solicita um token de redefinição de senha"
+
+    field :reset_password, mutation: Mutations::ResetPassword,
+                           description: "Redefine a senha usando um token válido"
+
     # Profile management
     field :update_my_profile, mutation: Mutations::UpdateMyProfile,
                               description: "Atualiza o perfil do usuário autenticado"

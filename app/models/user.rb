@@ -19,6 +19,7 @@ class User < ApplicationRecord
   has_many :roles, through: :user_roles
   has_many :permissions, through: :roles
   has_many :granted_roles, class_name: 'UserRole', foreign_key: 'granted_by_id', dependent: :nullify
+  has_many :password_reset_tokens, dependent: :destroy
 
   # Validations
   validates :email,
