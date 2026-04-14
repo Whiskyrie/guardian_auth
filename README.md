@@ -88,11 +88,13 @@ The project includes a robust seed system that creates environment-specific data
 ### Default Users (Development)
 
 **Admins:**
+
 - `admin@guardian.com` / `Admin123456`
 - `admin2@test.com` / `User123456`
 - `admin3@test.com` / `User123456`
 
 **Regular Users:**
+
 - `demo@guardian.com` / `Demo123456`
 - `user1@test.com` through `user5@test.com` / `User123456`
 
@@ -142,10 +144,12 @@ The project is configured to use PostgreSQL. See `config/database.yml` to adjust
 ### Endpoints
 
 **GraphQL Playground (Development)**
+
 - URL: `http://localhost:3000/graphiql`
 - Interactive interface for testing queries and mutations
 
 **GraphQL API**
+
 - URL: `http://localhost:3000/graphql`
 - Method: `POST`
 - Content-Type: `application/json`
@@ -158,13 +162,15 @@ The project is configured to use PostgreSQL. See `config/database.yml` to adjust
 mutation {
   registerUser(
     input: {
-      firstName: "João",
-      lastName: "Silva",
-      email: "joao.silva@example.com",
-      password: "SecureP@ss1",
+      firstName: "Joao"
+      lastName: "Silva"
+      email: "joao.silva@example.com"
+      password: "SecureP@ss1"
       passwordConfirmation: "SecureP@ss1"
     }
   ) {
+    success
+    message
     user {
       id
       email
@@ -172,7 +178,11 @@ mutation {
       lastName
     }
     token
-    errors
+    errors {
+      message
+      code
+      field
+    }
   }
 }
 ```
@@ -181,10 +191,9 @@ mutation {
 
 ```graphql
 mutation {
-  loginUser(
-    email: "joao.silva@example.com",
-    password: "SecureP@ss1"
-  ) {
+  loginUser(email: "joao.silva@example.com", password: "SecureP@ss1") {
+    success
+    message
     user {
       id
       email
@@ -192,7 +201,11 @@ mutation {
       lastName
     }
     token
-    errors
+    errors {
+      message
+      code
+      field
+    }
   }
 }
 ```
@@ -314,6 +327,7 @@ bundle exec bundler-audit update
 ```
 
 Additional security documentation:
+
 - [Branch Protection Guide](.github/BRANCH_PROTECTION.md)
 - [Security Guide](.github/SECURITY_GUIDE.md)
 
@@ -346,7 +360,7 @@ Contributions are welcome. Please follow the guidelines below.
    bundle exec rubocop
    bundle exec brakeman
    bundle exec bundler-audit check
-   rails test
+   bundle exec rspec
    ```
 6. Commit using [Conventional Commits](https://www.conventionalcommits.org/):
    ```bash
