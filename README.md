@@ -1,135 +1,156 @@
 # Guardian Auth
 
-Uma API de autenticação robusta construída com Ruby on Rails 8, GraphQL e JWT. Este projeto fornece um sistema completo de autenticação e autorização para aplicações modernas.
+A robust authentication API built with Ruby on Rails 8, GraphQL, and JWT. This project provides a complete authentication and authorization system for modern applications.
 
-## 🚀 Funcionalidades
+---
 
-- **Autenticação JWT**: Sistema seguro de autenticação baseado em JSON Web Tokens
-- **GraphQL API**: API moderna e flexível com GraphQL
-- **Validações Robustas**: Validações completas para usuários, incluindo formato de email e senha forte
-- **Autorização com Pundit**: Sistema de autorização baseado em políticas
-- **Banco de Dados PostgreSQL**: Banco de dados robusto e escalável
-- **Deploy com Kamal**: Deploy simplificado com Docker e Kamal
-- **Performance Otimizada**: Cache e filas com Solid Cache e Solid Queue
+## Features
 
-## 🛠️ Stack Tecnológica
+- **JWT Authentication**: Secure token-based authentication using JSON Web Tokens
+- **GraphQL API**: Modern and flexible API layer with full GraphQL support
+- **Robust Validations**: Comprehensive user validations including email format and strong password enforcement
+- **Policy-based Authorization**: Fine-grained authorization system powered by Pundit
+- **PostgreSQL**: Reliable and scalable relational database backend
+- **Kamal Deployment**: Streamlined deployment workflow with Docker and Kamal
+- **Optimized Performance**: Background jobs and caching via Solid Queue and Solid Cache
 
-- **Backend**: Ruby on Rails 8.0.2
-- **Banco de Dados**: PostgreSQL
-- **API**: GraphQL
-- **Autenticação**: JWT (JSON Web Tokens)
-- **Autorização**: Pundit
-- **Web Server**: Puma
-- **Deploy**: Kamal + Docker
-- **Cache**: Solid Cache
-- **Filas**: Solid Queue
-- **WebSockets**: Solid Cable
+---
 
-## 📋 Pré-requisitos
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Backend | Ruby on Rails 8.0.2 |
+| Database | PostgreSQL |
+| API | GraphQL |
+| Authentication | JWT (JSON Web Tokens) |
+| Authorization | Pundit |
+| Web Server | Puma |
+| Deployment | Kamal + Docker |
+| Cache | Solid Cache |
+| Job Queue | Solid Queue |
+| WebSockets | Solid Cable |
+
+---
+
+## Prerequisites
 
 - Ruby 3.0+
 - PostgreSQL 14+
-- Docker (para deploy)
-- Kamal (para deploy)
+- Docker (for deployment)
+- Kamal (for deployment)
 
-## 🚀 Instalação
+---
 
-1. **Clone o repositório**
-   ```bash
-   git clone https://github.com/Whiskyrie/guardian_auth.git
-   cd guardian_auth
-   ```
+## Installation
 
-2. **Instale as dependências**
-   ```bash
-   bundle install
-   ```
-
-3. **Configure o banco de dados**
-   ```bash
-   rails db:create
-   rails db:migrate
-   rails db:seed
-   ```
-
-## 🌱 Seeds e Dados de Teste
-
-O projeto inclui um sistema robusto de seeds que cria dados específicos por ambiente:
-
-### Usuários Padrão (Desenvolvimento)
-
-**Admins:**
-- `admin@guardian.com` / senha: `Admin123456`
-- `admin2@test.com` / senha: `User123456`
-- `admin3@test.com` / senha: `User123456`
-
-**Usuários:**
-- `demo@guardian.com` / senha: `Demo123456`
-- `user1@test.com` até `user5@test.com` / senha: `User123456`
-
-### Comandos dos Seeds
+**1. Clone the repository**
 
 ```bash
-# Executar seeds (idempotente)
+git clone https://github.com/Whiskyrie/guardian_auth.git
+cd guardian_auth
+```
+
+**2. Install dependencies**
+
+```bash
+bundle install
+```
+
+**3. Set up the database**
+
+```bash
+rails db:create
+rails db:migrate
+rails db:seed
+```
+
+**4. Configure environment variables**
+
+```bash
+cp .env.example .env
+```
+
+Edit the `.env` file with your configuration values.
+
+**5. Start the server**
+
+```bash
+rails server
+```
+
+---
+
+## Seeds and Test Data
+
+The project includes a robust seed system that creates environment-specific data.
+
+### Default Users (Development)
+
+**Admins:**
+- `admin@guardian.com` / `Admin123456`
+- `admin2@test.com` / `User123456`
+- `admin3@test.com` / `User123456`
+
+**Regular Users:**
+- `demo@guardian.com` / `Demo123456`
+- `user1@test.com` through `user5@test.com` / `User123456`
+
+### Seed Commands
+
+```bash
+# Run seeds (idempotent)
 rails db:seed
 
-# Recriar banco com seeds
+# Recreate database with seeds
 rails db:setup
 
-# Reset completo do banco
+# Full database reset
 rails db:reset
 ```
 
-Para mais informações sobre seeds, consulte [db/seeds/README.md](db/seeds/README.md).
+For more information, see [db/seeds/README.md](db/seeds/README.md).
 
-4. **Configure as variáveis de ambiente**
-   ```bash
-   cp .env.example .env
-   ```
-   Edite o arquivo `.env` com suas configurações.
+---
 
-5. **Inicie o servidor**
-   ```bash
-   rails server
-   ```
+## Configuration
 
-## 🔧 Configuração
-
-### Variáveis de Ambiente
-
-As seguintes variáveis de ambiente precisam ser configuradas:
+### Environment Variables
 
 ```env
 # Database
 DATABASE_URL=postgresql://username:password@localhost:5432/guardian_auth_development
 
 # JWT Secret
-SECRET_KEY_BASE=sua_chave_secreta_aqui
+SECRET_KEY_BASE=your_secret_key_here
 
 # Rails Environment
 RAILS_ENV=development
 ```
 
-### Configuração do Banco de Dados
+### Database Configuration
 
-O projeto está configurado para usar PostgreSQL. Verifique o arquivo `config/database.yml` para ajustar as configurações de conexão.
+The project is configured to use PostgreSQL. See `config/database.yml` to adjust connection settings.
 
-## 📚 API Documentation
+---
+
+## API Documentation
 
 ### Endpoints
 
-#### GraphQL Playground (Desenvolvimento)
-- **URL**: `http://localhost:3000/graphiql`
-- **Descrição**: Interface interativa para testar queries e mutations GraphQL
+**GraphQL Playground (Development)**
+- URL: `http://localhost:3000/graphiql`
+- Interactive interface for testing queries and mutations
 
-#### GraphQL API
-- **URL**: `http://localhost:3000/graphql`
-- **Método**: POST
-- **Content-Type**: application/json
+**GraphQL API**
+- URL: `http://localhost:3000/graphql`
+- Method: `POST`
+- Content-Type: `application/json`
 
-### Mutations Disponíveis
+### Available Mutations
 
-#### Registrar Usuário
+**Register User**
+
 ```graphql
 mutation {
   registerUser(
@@ -153,7 +174,8 @@ mutation {
 }
 ```
 
-#### Login de Usuário
+**Login**
+
 ```graphql
 mutation {
   loginUser(
@@ -172,9 +194,10 @@ mutation {
 }
 ```
 
-### Queries Disponíveis
+### Available Queries
 
-#### Obter Usuário Atual
+**Current User**
+
 ```graphql
 query {
   currentUser {
@@ -188,183 +211,184 @@ query {
 }
 ```
 
-## 🔐 Autenticação
+---
+
+## Authentication
 
 ### JWT Token
 
-O sistema utiliza JWT para autenticação. Após o login, você receberá um token que deve ser incluído no header das requisições:
+After login, include the returned token in the `Authorization` header of subsequent requests:
 
 ```http
-Authorization: Bearer <seu_token_jwt>
+Authorization: Bearer <your_jwt_token>
 ```
 
-### Validações
+### Validation Rules
 
-- **Email**: Deve ter formato válido e ser único
-- **Senha**: Mínimo de 8 caracteres, deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial (@$!%*?&)
-- **Nome**: Obrigatório, entre 2 e 50 caracteres
+- **Email**: Must be a valid format and unique
+- **Password**: Minimum 8 characters; must contain at least one uppercase letter, one lowercase letter, one digit, and one special character (`@$!%*?&`)
+- **Name**: Required, between 2 and 50 characters
 
-## 🧪 Testes
+---
 
-Para executar os testes:
+## Testing
 
 ```bash
-# Executar todos os testes
+# Run all tests
 bundle exec rspec
 
-# Executar testes específicos
+# Run a specific test file
 bundle exec rspec spec/models/user_spec.rb
 
-# Executar testes com coverage
+# Run tests with coverage report
 COVERAGE=true bundle exec rspec
 ```
 
-## 🚀 Deploy
+---
 
-### Usando Kamal
+## Deployment
 
-1. **Configure o Kamal**
-   ```bash
-   bundle exec kamal setup
-   ```
+### Using Kamal
 
-2. **Deploy para produção**
-   ```bash
-   bundle exec kamal deploy
-   ```
+```bash
+# Initial setup
+bundle exec kamal setup
 
-3. **Verificar status**
-   ```bash
-   bundle exec kamal details
-   ```
+# Deploy to production
+bundle exec kamal deploy
 
-### Variáveis de Ambiente de Produção
+# Check deployment status
+bundle exec kamal details
+```
 
-Configure as variáveis de ambiente de produção:
+### Production Environment Variables
 
 ```bash
 bundle exec kamal env set --production
 ```
 
-## 📊 Estrutura do Projeto
+---
+
+## Project Structure
 
 ```
 app/
-├── controllers/         # Controllers Rails
-├── graphql/            # Schema e tipos GraphQL
-│   ├── mutations/      # Mutations GraphQL
-│   ├── resolvers/      # Resolvers GraphQL
-│   └── types/          # Tipos GraphQL
-├── models/             # Models ActiveRecord
-├── policies/           # Políticas de autorização
-└── services/           # Serviços de negócio
+├── controllers/         # Rails controllers
+├── graphql/             # GraphQL schema and types
+│   ├── mutations/       # GraphQL mutations
+│   ├── resolvers/       # GraphQL resolvers
+│   └── types/           # GraphQL types
+├── models/              # ActiveRecord models
+├── policies/            # Authorization policies (Pundit)
+└── services/            # Business logic services
 ```
 
-## 🔧 Desenvolvimento
+---
 
-### Linting e Formatação
+## Development
 
-O projeto utiliza RuboCop para manter o código limpo e consistente:
+### Linting
 
 ```bash
-# Verificar problemas de estilo
+# Check style violations
 bundle exec rubocop
 
-# Corrigir problemas automaticamente
+# Auto-fix violations
 bundle exec rubocop -a
 ```
 
-### Segurança
-
-Para verificar vulnerabilidades de segurança:
+### Security
 
 ```bash
-# Security scan com Brakeman
+# Static analysis with Brakeman
 bundle exec brakeman
 
-# Verificar vulnerabilidades em dependências
+# Dependency vulnerability check
 bundle exec bundler-audit check
 
-# Atualizar database de vulnerabilidades
+# Update vulnerability database
 bundle exec bundler-audit update
 ```
 
-**Documentação de Segurança:**
-- [Guia de Proteção de Branches](.github/BRANCH_PROTECTION.md) - Como configurar proteções no GitHub
-- [Guia de Segurança](.github/SECURITY_GUIDE.md) - Práticas e checklist de segurança
+Additional security documentation:
+- [Branch Protection Guide](.github/BRANCH_PROTECTION.md)
+- [Security Guide](.github/SECURITY_GUIDE.md)
 
-### CI/CD
+### CI/CD Pipeline
 
-O projeto possui workflows automatizados para garantir qualidade:
+All pull requests run the following automated checks:
 
-- **RuboCop**: Linting e estilo de código
-- **Brakeman**: Análise de segurança
-- **Bundler Audit**: Verificação de vulnerabilidades em gems
-- **Tests**: Suite completa de testes
-- **CodeQL**: Análise de segurança do GitHub
+- **RuboCop** — Code style and linting
+- **Brakeman** — Static security analysis
+- **Bundler Audit** — Dependency vulnerability scanning
+- **RSpec** — Full test suite
+- **CodeQL** — GitHub security analysis
 
-Todos os checks devem passar antes de merge em `main` ou `develop`.
+All checks must pass before merging into `main` or `develop`.
 
-## Contribuindo
+---
 
-Contribuições são bem-vindas! Por favor, siga estas diretrizes:
+## Contributing
 
-### Processo de Contribuição
+Contributions are welcome. Please follow the guidelines below.
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Siga as convenções de código (veja [AGENTS.md](AGENTS.md))
-4. Escreva testes para novas funcionalidades
-5. Execute os testes e validações:
+### Workflow
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/your-feature`
+3. Follow the code conventions described in [AGENTS.md](AGENTS.md)
+4. Write tests for new functionality
+5. Run all validations before committing:
    ```bash
    bundle exec rubocop
    bundle exec brakeman
    bundle exec bundler-audit check
    rails test
    ```
-6. Commit suas mudanças usando [Conventional Commits](https://www.conventionalcommits.org/):
+6. Commit using [Conventional Commits](https://www.conventionalcommits.org/):
    ```bash
-   git commit -m "feat(auth): adiciona autenticação de dois fatores"
+   git commit -m "feat(auth): add two-factor authentication"
    ```
-7. Push para sua branch (`git push origin feature/nova-feature`)
-8. Abra um Pull Request seguindo o template
+7. Push and open a Pull Request following the provided template
 
-### Padrão de Commits
+### Commit Convention
 
-Use o padrão Conventional Commits:
+| Prefix | Purpose |
+|---|---|
+| `feat(scope):` | New feature |
+| `fix(scope):` | Bug fix |
+| `docs(scope):` | Documentation changes only |
+| `refactor(scope):` | Code refactoring without behavior change |
+| `test(scope):` | Adding or updating tests |
+| `chore(scope):` | Maintenance tasks |
 
-- `feat(escopo):` - Nova funcionalidade
-- `fix(escopo):` - Correção de bug
-- `docs(escopo):` - Apenas documentação
-- `refactor(escopo):` - Refatoração de código
-- `test(escopo):` - Adição/atualização de testes
-- `chore(escopo):` - Tarefas de manutenção
+### Code Review Requirements
 
-### Code Review
+All pull requests must:
+- Receive approval from at least 1 reviewer (`develop`) or 2 reviewers (`main`)
+- Pass all CI/CD checks
+- Resolve all open review conversations
+- Be up to date with the target branch
 
-Todos os PRs passam por code review e devem:
-- Ter aprovação de pelo menos 1 revisor (develop) ou 2 revisores (main)
-- Passar em todos os checks de CI/CD
-- Resolver todas as conversas
-- Estar atualizado com a branch base
+### Branch Protection Summary
 
-### Proteção de Branches
-
-- **`main`**: Requer 2 aprovações, todos os checks, commits assinados
-- **`develop`**: Requer 1 aprovação, checks básicos (RuboCop, Tests)
-
-## Licença
-
-Este projeto está licenciado sob a MIT License - veja o arquivo [LICENSE](LICENSE) para detalhes.
-
-## Suporte
-
-Se você tiver alguma dúvida ou problema, por favor:
-
-1. Verifique a documentação
-2. Abra uma issue no GitHub
-3. Entre em contato com a equipe de desenvolvimento
+| Branch | Required Approvals | Signed Commits |
+|---|---|---|
+| `main` | 2 | Yes |
+| `develop` | 1 | No |
 
 ---
 
-**Desenvolvido com ❤️ usando Ruby on Rails**
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Support
+
+If you encounter any issues or have questions:
+
+1. Check the existing documentation
+2. Open an issue on GitHub
+3. Contact the development team
