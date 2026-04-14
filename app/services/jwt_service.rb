@@ -22,15 +22,23 @@ class JwtService
     nil
   end
 
+  def self.decode_without_verification(token)
+    body = JWT.decode(token, nil, false)[0]
+    HashWithIndifferentAccess.new(body)
+  rescue JWT::DecodeError => e
+    Rails.logger.warn "JWT decode without verification error: #{e.message}"
+    nil
+  end
+
   def self.decode_allowing_expired(token)
     # Decode with signature verification but skip expiration check
     body = JWT.decode(token, SECRET_KEY, true, {
-      verify_expiration: false,
-      verify_not_before: true,
-      verify_iat: true,
-      verify_jti: true,
-      sub: nil
-    })[0]
+                        verify_expiration: false,
+                        verify_not_before: true,
+                        verify_iat: true,
+                        verify_jti: true,
+                        sub: nil
+                      })[0]
     HashWithIndifferentAccess.new(body)
   rescue JWT::InvalidSignature
     Rails.logger.warn 'JWT token has invalid signature in decode_allowing_expired'

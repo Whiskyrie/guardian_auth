@@ -124,6 +124,9 @@ DATABASE_URL=postgresql://username:password@localhost:5432/guardian_auth_develop
 # JWT Secret
 SECRET_KEY_BASE=your_secret_key_here
 
+# CORS (production)
+ALLOWED_ORIGINS=https://yourapp.com,https://app.yourapp.com
+
 # Rails Environment
 RAILS_ENV=development
 ```
