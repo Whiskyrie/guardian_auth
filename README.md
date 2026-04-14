@@ -210,13 +210,13 @@ Para executar os testes:
 
 ```bash
 # Executar todos os testes
-rails test
+bundle exec rspec
 
 # Executar testes específicos
-rails test test/models/user_test.rb
+bundle exec rspec spec/models/user_spec.rb
 
 # Executar testes com coverage
-rails test:coverage
+COVERAGE=true bundle exec rspec
 ```
 
 ## 🚀 Deploy
