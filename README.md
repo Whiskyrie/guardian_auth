@@ -18,18 +18,18 @@ A robust authentication API built with Ruby on Rails 8, GraphQL, and JWT. This p
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Backend | Ruby on Rails 8.0.2 |
-| Database | PostgreSQL |
-| API | GraphQL |
+| Layer          | Technology            |
+| -------------- | --------------------- |
+| Backend        | Ruby on Rails 8.0.2   |
+| Database       | PostgreSQL            |
+| API            | GraphQL               |
 | Authentication | JWT (JSON Web Tokens) |
-| Authorization | Pundit |
-| Web Server | Puma |
-| Deployment | Kamal + Docker |
-| Cache | Solid Cache |
-| Job Queue | Solid Queue |
-| WebSockets | Solid Cable |
+| Authorization  | Pundit                |
+| Web Server     | Puma                  |
+| Deployment     | Kamal + Docker        |
+| Cache          | Solid Cache           |
+| Job Queue      | Solid Queue           |
+| WebSockets     | Solid Cable           |
 
 ---
 
@@ -353,18 +353,19 @@ Contributions are welcome. Please follow the guidelines below.
 
 ### Commit Convention
 
-| Prefix | Purpose |
-|---|---|
-| `feat(scope):` | New feature |
-| `fix(scope):` | Bug fix |
-| `docs(scope):` | Documentation changes only |
+| Prefix             | Purpose                                  |
+| ------------------ | ---------------------------------------- |
+| `feat(scope):`     | New feature                              |
+| `fix(scope):`      | Bug fix                                  |
+| `docs(scope):`     | Documentation changes only               |
 | `refactor(scope):` | Code refactoring without behavior change |
-| `test(scope):` | Adding or updating tests |
-| `chore(scope):` | Maintenance tasks |
+| `test(scope):`     | Adding or updating tests                 |
+| `chore(scope):`    | Maintenance tasks                        |
 
 ### Code Review Requirements
 
 All pull requests must:
+
 - Receive approval from at least 1 reviewer (`develop`) or 2 reviewers (`main`)
 - Pass all CI/CD checks
 - Resolve all open review conversations
@@ -372,10 +373,10 @@ All pull requests must:
 
 ### Branch Protection Summary
 
-| Branch | Required Approvals | Signed Commits |
-|---|---|---|
-| `main` | 2 | Yes |
-| `develop` | 1 | No |
+| Branch    | Required Approvals | Signed Commits |
+| --------- | ------------------ | -------------- |
+| `main`    | 2                  | Yes            |
+| `develop` | 1                  | No             |
 
 ---
 

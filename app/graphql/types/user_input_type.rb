@@ -1,17 +1,17 @@
 module Types
   class UserInputType < Types::BaseInputObject
-    description 'Entrada de dados para atualização de informações do usuário'
+    description 'Input type for updating user information'
 
     argument :first_name, String, required: false,
-                                  description: "Primeiro nome do usuário"
+                                  description: "User's first name"
 
     argument :last_name, String, required: false,
-                                 description: "Sobrenome do usuário"
+                                 description: "User's last name"
 
     argument :email, String, required: false,
-                             description: "Endereço de email do usuário (deve ser único no sistema)"
+                             description: "User email address (must be unique in the system)"
 
     argument :role, Types::UserRoleEnum, required: false,
-                                         description: "Papel/função do usuário no sistema (apenas administradores podem alterar)"
+                                         description: "User role in the system (only administrators can change this)"
   end
 end

@@ -1,11 +1,10 @@
 require_relative 'errors/base_error'
 require_relative 'errors/error_codes'
-require_relative 'middleware/logging_middleware'
 require_relative 'tracers/performance_tracer'
 require_relative 'analyzers/query_complexity_analyzer'
 
 class GuardianAuthSchema < GraphQL::Schema
-  description "Guardian Auth API - Sistema de autenticação e autorização com JWT e GraphQL"
+  description "Guardian Auth API - Authentication and authorization system with JWT and GraphQL"
 
   mutation(Types::MutationType)
   query(Types::QueryType)

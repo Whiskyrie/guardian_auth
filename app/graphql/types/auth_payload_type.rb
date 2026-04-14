@@ -1,14 +1,14 @@
 module Types
   class AuthPayloadType < Types::BaseObject
-    description "Payload de resposta para operações de autenticação"
+    description "Response payload for authentication operations"
 
     field :token, String, null: true,
-                          description: "Token JWT de acesso para autenticação nas próximas requisições"
+                          description: "JWT access token for authenticating subsequent requests"
 
     field :user, UserType, null: true,
-                           description: "Dados do usuário autenticado"
+                           description: "Authenticated user data"
 
     field :errors, [Types::UserErrorType], null: false,
-                                           description: "Lista de erros que ocorreram durante a operação de autenticação"
+                                           description: "List of errors from the authentication operation"
   end
 end
