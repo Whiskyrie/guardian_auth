@@ -67,23 +67,9 @@
     ['127.0.0.1', '::1'].include?(req.ip)
   end
 
-  # Safelist authenticated admin users (if API key present)
-  Rack::Attack.safelist('allow authenticated admins') do |req|
-    # Extract user from JWT token
-    auth_header = req.get_header('HTTP_AUTHORIZATION')
-    if auth_header
-      token = auth_header.match(/^Bearer\s+(.+)$/i)&.[](1)
-      if token
-        begin
-          decoded_token = JwtService.decode(token)
-          user_role = decoded_token&.dig('role')
-          user_role == 'admin'
-        rescue StandardError
-          false
-        end
-      end
-    end
-  end
+  # NOTE: Admin users are no longer exempt from rate limiting.
+  # Removing admin safelist prevents privilege escalation via compromised admin tokens.
+  # If admins need higher limits, add specific throttle overrides instead.
 
   # Block suspicious paths and common attack vectors
   Rack::Attack.blocklist('block suspicious requests') do |req|

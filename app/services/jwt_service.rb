@@ -23,21 +23,21 @@ class JwtService
   end
 
   def self.decode_allowing_expired(token)
-    # First try to decode normally
-    decoded = decode(token)
-    return decoded if decoded
-
-    # If failed due to expiration, try to decode without verification
-    begin
-      body = JWT.decode(token, SECRET_KEY, false)[0]
-      HashWithIndifferentAccess.new(body)
-    rescue JWT::InvalidSignature
-      Rails.logger.warn 'JWT token has invalid signature'
-      nil
-    rescue JWT::DecodeError => e
-      Rails.logger.warn "JWT decode error: #{e.message}"
-      nil
-    end
+    # Decode with signature verification but skip expiration check
+    body = JWT.decode(token, SECRET_KEY, true, {
+      verify_expiration: false,
+      verify_not_before: true,
+      verify_iat: true,
+      verify_jti: true,
+      sub: nil
+    })[0]
+    HashWithIndifferentAccess.new(body)
+  rescue JWT::InvalidSignature
+    Rails.logger.warn 'JWT token has invalid signature in decode_allowing_expired'
+    nil
+  rescue JWT::DecodeError => e
+    Rails.logger.warn "JWT decode error in decode_allowing_expired: #{e.message}"
+    nil
   end
 
   def self.valid_token?(token)
@@ -54,7 +54,7 @@ class JwtService
   # Check if a token is blacklisted (works with expired tokens too)
   # Useful for refresh token validation where tokens may be expired
   def self.token_blacklisted?(token)
-    decoded = decode_without_verification(token)
+    decoded = decode_allowing_expired(token)
     return false unless decoded
 
     jti = decoded['jti']
@@ -68,7 +68,7 @@ class JwtService
   end
 
   def self.blacklist_token!(token, user_id, reason: 'logout')
-    decoded = decode_without_verification(token)
+    decoded = decode_allowing_expired(token)
     return false unless decoded
 
     jti = decoded['jti']
@@ -95,16 +95,7 @@ class JwtService
   end
 
   def self.extract_jti_from_token(token)
-    decoded = decode_without_verification(token)
+    decoded = decode_allowing_expired(token)
     decoded&.dig('jti')
   end
-
-  def self.decode_without_verification(token)
-    body = JWT.decode(token, nil, false)[0]
-    HashWithIndifferentAccess.new(body)
-  rescue JWT::DecodeError => e
-    Rails.logger.warn "JWT decode error: #{e.message}"
-    nil
-  end
-
 end

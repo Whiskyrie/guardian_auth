@@ -3,6 +3,7 @@ class ApplicationController < ActionController::API
 
   # Set up request context for audit logging
   before_action :set_request_context
+  after_action :clear_request_context
 
   # Handle Pundit authorization errors
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
@@ -21,6 +22,11 @@ class ApplicationController < ActionController::API
 
     # Store current user in thread for audit logging
     Thread.current[:current_user] = current_user if respond_to?(:current_user) && current_user
+  end
+
+  def clear_request_context
+    Thread.current[:current_user] = nil
+    Thread.current[:request_context] = nil
   end
 
   def user_not_authorized
