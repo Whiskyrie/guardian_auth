@@ -53,7 +53,7 @@ module Authentication
   end
 
   def current_token
-    Rails.logger.info "Current token requested: #{@current_token ? 'present' : 'nil'}"
+    Rails.logger.debug "Current token requested: #{@current_token ? 'present' : 'nil'}"
     @current_token
   end
 
@@ -67,7 +67,7 @@ module Authentication
     # Expected format: "Bearer <token>"
     token_match = authorization_header.match(/^Bearer\s+(.+)$/i)
     extracted_token = token_match&.[](1)
-    Rails.logger.info "Extracted token: #{extracted_token ? 'present' : 'nil'}"
+    Rails.logger.debug "Extracted token: #{extracted_token ? 'present' : 'nil'}"
     extracted_token
   end
 

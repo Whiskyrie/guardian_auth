@@ -16,7 +16,7 @@ class GraphqlController < ApplicationController
     token = extract_token_from_header
     current_user = current_user_from_token
 
-    Rails.logger.info "GraphQL Context - Token: #{token ? 'present' : 'nil'}, User: #{current_user ? 'present' : 'nil'}"
+    Rails.logger.debug "GraphQL Context - Token: #{token ? 'present' : 'nil'}, User: #{current_user ? 'present' : 'nil'}"
 
     context = {
       current_user: current_user,
