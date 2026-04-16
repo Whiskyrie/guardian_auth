@@ -28,8 +28,14 @@ RSpec.describe 'ChangePassword mutation', type: :graphql do
     it 'changes the password and returns success' do
       result = run_mutation(new_password: 'NewSecure1@')
 
+      # Debug: print result if failing
+      data = gql_data(result)&.fetch('changePassword', nil)
+      unless data&.dig('success')
+        puts "DEBUG: errors=#{gql_errors(result).inspect}"
+        puts "DEBUG: data=#{data.inspect}"
+      end
+
       expect(gql_errors(result)).to be_nil
-      data = gql_data(result)['changePassword']
       expect(data['success']).to be true
       expect(data['message']).to eq('Password changed successfully. Please login again.')
       expect(data['user']).to be_present
@@ -83,7 +89,9 @@ RSpec.describe 'ChangePassword mutation', type: :graphql do
         user: nil
       )
 
-      expect(gql_errors(result)).to be_present
+      data = gql_data(result)['changePassword']
+      expect(data['success']).to be false
+      expect(data['errors'].first['code']).to eq('AUTHENTICATION_REQUIRED')
     end
   end
 end
