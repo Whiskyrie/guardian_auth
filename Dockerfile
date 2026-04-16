@@ -28,6 +28,7 @@ RUN apt-get update -qq && \
       build-essential \
       libpq-dev \
       libhiredis-dev \
+      libyaml-dev \
       pkg-config \
     && rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
