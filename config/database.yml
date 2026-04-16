@@ -84,6 +84,7 @@ production:
     database: guardian_auth_production
     username: guardian_auth
     password: <%= ENV["GUARDIAN_AUTH_DATABASE_PASSWORD"] %>
+    host: <%= ENV.fetch("DB_HOST", "localhost") %>
   cache:
     <<: *primary_production
     database: guardian_auth_production_cache
