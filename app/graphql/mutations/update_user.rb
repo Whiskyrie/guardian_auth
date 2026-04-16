@@ -11,7 +11,7 @@ module Mutations
     field :errors, [Types::UserErrorType], null: false
 
     def resolve(id:, input:)
-      user = User.find_by(id: id)
+      user = resolve_user(id)
 
       unless user
         return {
@@ -54,6 +54,20 @@ module Mutations
     end
 
     private
+
+    def resolve_user(id)
+      # Support GlobalID resolution (e.g. from Relay)
+      # to_gid_param returns base64-encoded GlobalID, try parsing it first
+      gid = GlobalID.parse(id) || GlobalID.parse(Base64.urlsafe_decode64(id.to_s))
+      if gid
+        record = GlobalID::Locator.locate(gid)
+        record.is_a?(User) ? record : nil
+      else
+        User.find_by(id: id)
+      end
+    rescue StandardError
+      nil
+    end
 
     def validate_role_change(input)
       return unless input[:role].present?
