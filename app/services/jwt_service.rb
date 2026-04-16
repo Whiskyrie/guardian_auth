@@ -1,20 +1,21 @@
 class JwtService
-  SECRET_KEY = Rails.application.credentials.secret_key_base
+  SECRET_KEY = Rails.application.credentials.secret_key_base || Rails.application.secret_key_base
+  ALGORITHM = 'HS256'
 
   def self.encode(payload, exp = 24.hours.from_now)
     payload[:exp] = exp.to_i
     payload[:iat] = Time.current.to_i
     payload[:jti] = SecureRandom.uuid
-    JWT.encode(payload, SECRET_KEY)
+    JWT.encode(payload, SECRET_KEY, ALGORITHM)
   end
 
   def self.decode(token)
-    body = JWT.decode(token, SECRET_KEY)[0]
+    body = JWT.decode(token, SECRET_KEY, true, { algorithm: ALGORITHM })[0]
     HashWithIndifferentAccess.new(body)
   rescue JWT::ExpiredSignature
     Rails.logger.info 'JWT token has expired'
     nil
-  rescue JWT::InvalidSignature
+  rescue JWT::VerificationError
     Rails.logger.warn 'JWT token has invalid signature'
     nil
   rescue JWT::DecodeError => e
@@ -33,6 +34,7 @@ class JwtService
   def self.decode_allowing_expired(token)
     # Decode with signature verification but skip expiration check
     body = JWT.decode(token, SECRET_KEY, true, {
+                        algorithm: ALGORITHM,
                         verify_expiration: false,
                         verify_not_before: true,
                         verify_iat: true,
@@ -40,7 +42,7 @@ class JwtService
                         sub: nil
                       })[0]
     HashWithIndifferentAccess.new(body)
-  rescue JWT::InvalidSignature
+  rescue JWT::VerificationError
     Rails.logger.warn 'JWT token has invalid signature in decode_allowing_expired'
     nil
   rescue JWT::DecodeError => e
@@ -89,7 +91,7 @@ class JwtService
       expires_at: expires_at,
       reason: reason
     )
-  rescue ActiveRecord::RecordNotUnique
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
     # Token already blacklisted
     Rails.logger.info "Token #{jti} already blacklisted"
     true

@@ -14,25 +14,25 @@ RSpec.describe JwtService, type: :service do
 
     it 'includes exp in the payload' do
       token = JwtService.encode(user_id: user.id)
-      decoded = JWT.decode(token, JwtService::SECRET_KEY)[0]
+      decoded = JWT.decode(token, JwtService::SECRET_KEY, true, { algorithm: JwtService::ALGORITHM })[0]
       expect(decoded['exp']).to be_present
     end
 
     it 'includes iat in the payload' do
       token = JwtService.encode(user_id: user.id)
-      decoded = JWT.decode(token, JwtService::SECRET_KEY)[0]
+      decoded = JWT.decode(token, JwtService::SECRET_KEY, true, { algorithm: JwtService::ALGORITHM })[0]
       expect(decoded['iat']).to be_present
     end
 
     it 'includes jti in the payload' do
       token = JwtService.encode(user_id: user.id)
-      decoded = JWT.decode(token, JwtService::SECRET_KEY)[0]
+      decoded = JWT.decode(token, JwtService::SECRET_KEY, true, { algorithm: JwtService::ALGORITHM })[0]
       expect(decoded['jti']).to be_present
     end
 
     it 'includes custom payload data' do
       token = JwtService.encode(user_id: user.id, role: 'admin')
-      decoded = JWT.decode(token, JwtService::SECRET_KEY)[0]
+      decoded = JWT.decode(token, JwtService::SECRET_KEY, true, { algorithm: JwtService::ALGORITHM })[0]
       expect(decoded['user_id']).to eq(user.id)
       expect(decoded['role']).to eq('admin')
     end
