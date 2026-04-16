@@ -54,6 +54,7 @@ module Mutations
 
       # Update password
       user.password = new_password
+      user.password_confirmation = new_password
 
       if user.save
         # Mark token as used
@@ -71,7 +72,7 @@ module Mutations
           action: 'password_reset_completed',
           resource: 'User',
           resource_id: user.id.to_s,
-          user_id: user.id,
+          user: user,
           metadata: {
             ip_address: context[:remote_ip],
             user_agent: context[:user_agent],

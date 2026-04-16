@@ -14,7 +14,15 @@ module Mutations
     field :errors, [Types::UserErrorType], null: false, description: 'List of validation errors'
 
     def resolve(current_password:, new_password:)
-      authenticate!
+      unless authenticated?
+        return {
+          success: false,
+          message: 'Authentication required',
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::AUTHENTICATION_REQUIRED,
+                             'Authentication required. Please provide a valid token.')
+        }
+      end
 
       user = current_user
 
@@ -28,6 +36,7 @@ module Mutations
       end
 
       user.password = new_password
+      user.password_confirmation = new_password
 
       if user.save
         # Invalidate all existing tokens for security
