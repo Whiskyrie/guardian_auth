@@ -6,7 +6,7 @@ require 'rails/all'
 Bundler.require(*Rails.groups)
 
 # Require custom middleware
-require_relative '../app/middleware/security_headers_middleware'
+require_relative '../lib/security_headers_middleware'
 
 module GuardianAuth
   class Application < Rails::Application
