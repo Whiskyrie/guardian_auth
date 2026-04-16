@@ -2,6 +2,16 @@ class User < ApplicationRecord
   include Auditable
   has_secure_password
 
+  # Override password= to prevent clearing password_digest when nil
+  # This allows updating user attributes without re-validating password
+  def password=(unencrypted_password)
+    if unencrypted_password.nil?
+      @password = nil
+    else
+      super
+    end
+  end
+
   # Constants
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
 
@@ -205,12 +215,13 @@ class User < ApplicationRecord
 
   def assign_default_role
     # Assign default 'user' role if no roles are assigned
-    if roles.empty?
-      default_role = Role.find_by(name: 'user')
-      if default_role
-        user_roles.create!(role: default_role, granted_at: Time.current)
-      end
+    return unless roles.empty?
+
+    default_role = Role.find_or_create_by!(name: 'user') do |r|
+      r.description = 'Default user role'
+      r.system_role = true
     end
+    user_roles.create!(role: default_role, granted_at: Time.current)
   end
 
   def sanitize_user_inputs
