@@ -9,7 +9,7 @@ example_id                                                     | status | run_ti
 ./spec/graphql/mutation_error_exposure_spec.rb[1:3:1]          | passed | 0.04978 seconds |
 ./spec/graphql/mutation_error_exposure_spec.rb[1:3:2]          | passed | 0.06413 seconds |
 ./spec/graphql/mutation_error_exposure_spec.rb[1:3:3]          | passed | 0.05292 seconds |
-./spec/graphql/mutations/change_password_spec.rb[1:1:1]        | failed | 0.04754 seconds |
+./spec/graphql/mutations/change_password_spec.rb[1:1:1]        | failed | 0.96184 seconds |
 ./spec/graphql/mutations/change_password_spec.rb[1:1:2]        | failed | 0.04751 seconds |
 ./spec/graphql/mutations/change_password_spec.rb[1:1:3]        | failed | 0.04803 seconds |
 ./spec/graphql/mutations/change_password_spec.rb[1:2:1]        | passed | 0.04064 seconds |
@@ -23,7 +23,7 @@ example_id                                                     | status | run_ti
 ./spec/graphql/mutations/login_user_spec.rb[1:3:1]             | passed | 0.00864 seconds |
 ./spec/graphql/mutations/login_user_spec.rb[1:3:2]             | passed | 0.06116 seconds |
 ./spec/graphql/mutations/register_user_spec.rb[1:1:1]          | passed | 0.02539 seconds |
-./spec/graphql/mutations/register_user_spec.rb[1:1:2]          | failed | 0.03062 seconds |
+./spec/graphql/mutations/register_user_spec.rb[1:1:2]          | failed | 0.03635 seconds |
 ./spec/graphql/mutations/register_user_spec.rb[1:2:1]          | passed | 0.04746 seconds |
 ./spec/graphql/mutations/register_user_spec.rb[1:3:1]          | passed | 0.01495 seconds |
 ./spec/graphql/mutations/register_user_spec.rb[1:3:2]          | passed | 0.01619 seconds |
@@ -35,7 +35,7 @@ example_id                                                     | status | run_ti
 ./spec/graphql/mutations/request_password_reset_spec.rb[1:2:1] | passed | 0.00955 seconds |
 ./spec/graphql/mutations/request_password_reset_spec.rb[1:2:2] | passed | 0.01131 seconds |
 ./spec/graphql/mutations/request_password_reset_spec.rb[1:3:1] | passed | 0.00697 seconds |
-./spec/graphql/mutations/reset_password_spec.rb[1:1:1]         | failed | 0.08949 seconds |
+./spec/graphql/mutations/reset_password_spec.rb[1:1:1]         | failed | 0.10976 seconds |
 ./spec/graphql/mutations/reset_password_spec.rb[1:1:2]         | passed | 0.08203 seconds |
 ./spec/graphql/mutations/reset_password_spec.rb[1:1:3]         | passed | 0.137 seconds   |
 ./spec/graphql/mutations/reset_password_spec.rb[1:2:1]         | passed | 0.01045 seconds |
@@ -53,7 +53,7 @@ example_id                                                     | status | run_ti
 ./spec/graphql/pii_log_protection_spec.rb[1:3:1]               | passed | 0.03679 seconds |
 ./spec/graphql/role_validation_and_user_query_spec.rb[1:1:1]   | passed | 0.05973 seconds |
 ./spec/graphql/role_validation_and_user_query_spec.rb[1:2:1]   | passed | 0.08629 seconds |
-./spec/graphql/update_user_idor_spec.rb[1:1:1]                 | failed | 0.07588 seconds |
+./spec/graphql/update_user_idor_spec.rb[1:1:1]                 | failed | 0.08893 seconds |
 ./spec/graphql/update_user_idor_spec.rb[1:2:1]                 | passed | 0.05577 seconds |
 ./spec/graphql/update_user_idor_spec.rb[1:3:1]                 | passed | 0.05229 seconds |
 ./spec/graphql/update_user_idor_spec.rb[1:4:1]                 | passed | 0.05316 seconds |
@@ -149,7 +149,7 @@ example_id                                                     | status | run_ti
 ./spec/models/user_spec.rb[1:1:2:5]                            | passed | 0.01732 seconds |
 ./spec/models/user_spec.rb[1:1:2:6]                            | passed | 0.01657 seconds |
 ./spec/models/user_spec.rb[1:1:2:7]                            | passed | 0.01687 seconds |
-./spec/models/user_spec.rb[1:1:2:8]                            | failed | 0.03617 seconds |
+./spec/models/user_spec.rb[1:1:2:8]                            | failed | 0.03817 seconds |
 ./spec/models/user_spec.rb[1:1:3:1]                            | passed | 0.01923 seconds |
 ./spec/models/user_spec.rb[1:1:3:2]                            | passed | 0.01644 seconds |
 ./spec/models/user_spec.rb[1:1:3:3]                            | passed | 0.01584 seconds |
