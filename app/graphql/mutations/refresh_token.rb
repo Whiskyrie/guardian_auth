@@ -80,7 +80,7 @@ module Mutations
       end
 
       # Step 9: Generate new token
-      new_token = JwtService.encode(user_id: user.id)
+      new_token = JwtService.encode(user_id: user.id, role: user.primary_role)
       return error_response('Failed to generate new token', code: Errors::ErrorCodes::INTERNAL_ERROR) unless new_token
 
       # Update last login timestamp
