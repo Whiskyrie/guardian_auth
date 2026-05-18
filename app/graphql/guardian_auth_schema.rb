@@ -158,12 +158,6 @@ class GuardianAuthSchema < GraphQL::Schema
     nil
   end
 
-  # Limit the size of incoming queries:
-  max_query_string_tokens(5000)
-
-  # Stop validating when it encounters this many errors:
-  validate_max_errors(5)
-
   # Relay-style Object Identification:
 
   # Return a string UUID for `object`
