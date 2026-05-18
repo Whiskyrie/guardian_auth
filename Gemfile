@@ -25,10 +25,6 @@ gem 'connection_pool'
 gem 'hiredis-client'
 gem 'redis', '~> 5.0'
 
-# Formatador
-gem 'rubocop'
-gem 'ruby-lsp'
-
 # GraphQL
 gem 'graphql'
 gem 'graphql-batch'
@@ -65,8 +61,10 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'rspec-rails', '~> 7.1'
+  gem 'rubocop', require: false
   gem 'rubocop-rails-omakase', require: false
   gem 'rubocop-rspec', require: false
+  gem 'ruby-lsp', require: false
 end
 
 group :test do
