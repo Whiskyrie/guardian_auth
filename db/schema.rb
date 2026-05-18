@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_28_155216) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_18_081454) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -19,10 +19,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_28_155216) do
     t.string "action", null: false, comment: "login, logout, register, etc"
     t.string "resource", null: false, comment: "User, Token, etc"
     t.string "resource_id"
-    t.json "metadata", comment: "IP, user_agent, changes, request_id"
+    t.jsonb "metadata", comment: "IP, user_agent, changes, request_id"
     t.string "result", null: false, comment: "success, failure, blocked"
     t.datetime "created_at", null: false
     t.index ["action", "created_at"], name: "index_audit_logs_on_action_and_created_at"
+    t.index ["metadata"], name: "index_audit_logs_on_metadata", using: :gin
     t.index ["resource", "resource_id"], name: "index_audit_logs_on_resource_and_resource_id"
     t.index ["result", "created_at"], name: "index_audit_logs_on_result_and_created_at"
     t.index ["user_id", "created_at"], name: "index_audit_logs_on_user_id_and_created_at"
