@@ -12,10 +12,8 @@ module Authentication
     # Store token for later use (logout operations)
     @current_token = token
 
-    # Check if token is valid (includes blacklist check)
-    return nil unless JwtService.valid_token?(token)
-
-    decoded_token = JwtService.decode(token)
+    # Single decode: verifies signature, expiry, and blacklist atomically
+    decoded_token = JwtService.decode_and_verify(token)
     return nil unless decoded_token
 
     user_id = decoded_token['user_id']

@@ -1,6 +1,5 @@
 class GraphqlController < ApplicationController
   include Authentication
-  include Authorization
 
   # If accessing from outside this domain, nullify the session
   # This allows for outside API access while preventing CSRF attacks,
@@ -23,8 +22,7 @@ class GraphqlController < ApplicationController
       current_user: current_user,
       current_token: token,
       remote_ip: request.remote_ip,
-      user_agent: request.user_agent,
-      pundit: pundit_user
+      user_agent: request.user_agent
     }
 
     # Start timing

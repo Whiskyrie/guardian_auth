@@ -50,15 +50,20 @@ class JwtService
     nil
   end
 
-  def self.valid_token?(token)
-    return false unless decode(token).present?
-
-    # Check if token is blacklisted
+  # Decodes once, verifies signature + expiry, checks blacklist.
+  # Returns the payload hash or nil if the token is invalid/revoked.
+  def self.decode_and_verify(token)
     decoded = decode(token)
-    jti = decoded&.dig('jti')
-    return false if jti && blacklisted?(jti)
+    return nil unless decoded
 
-    true
+    jti = decoded['jti']
+    return nil if jti && blacklisted?(jti)
+
+    decoded
+  end
+
+  def self.valid_token?(token)
+    decode_and_verify(token).present?
   end
 
   # Check if a token is blacklisted (works with expired tokens too)
