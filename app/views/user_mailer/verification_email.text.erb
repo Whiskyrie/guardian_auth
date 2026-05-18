@@ -1,0 +1,14 @@
+Olá, <%= @user.first_name %>!
+
+Obrigado por se registrar no Guardian Auth.
+
+Para confirmar seu endereço de email, acesse o link abaixo:
+
+  <%= @verify_url %>
+
+Este link expira em <%= @expires_in %>.
+
+Se você não criou uma conta, ignore este email.
+
+--
+Guardian Auth
