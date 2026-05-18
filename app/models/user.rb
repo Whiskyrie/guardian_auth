@@ -14,6 +14,7 @@ class User < ApplicationRecord
 
   # Constants
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
+  VERIFICATION_TOKEN_EXPIRY = 24.hours
 
   # Strong password requirements: min 8 chars, at least one uppercase, lowercase, digit, and special char
   PASSWORD_REGEX = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}\z/
@@ -182,6 +183,42 @@ class User < ApplicationRecord
 
   def track_profile_update!
     update_column(:profile_updated_at, Time.current)
+  end
+
+  # Email verification
+  def email_verified?
+    email_verified_at.present?
+  end
+
+  def generate_email_verification_token!
+    raw_token = SecureRandom.urlsafe_base64(32)
+    update_columns(
+      email_verification_digest: Digest::SHA256.hexdigest(raw_token),
+      email_verification_sent_at: Time.current
+    )
+    raw_token
+  end
+
+  def verify_email!(token)
+    digest = Digest::SHA256.hexdigest(token.to_s)
+    return :invalid unless ActiveSupport::SecurityUtils.secure_compare(
+      email_verification_digest.to_s, digest
+    )
+    return :expired if email_verification_sent_at.nil? ||
+                       email_verification_sent_at < VERIFICATION_TOKEN_EXPIRY.ago
+    return :already_verified if email_verified?
+
+    update_columns(
+      email_verified_at: Time.current,
+      email_verification_digest: nil,
+      email_verification_sent_at: nil
+    )
+    :ok
+  end
+
+  def verification_cooldown_active?
+    email_verification_sent_at.present? &&
+      email_verification_sent_at > 15.minutes.ago
   end
 
   # Status helpers
