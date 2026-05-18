@@ -39,17 +39,36 @@ module Mutations
 
       user = User.find_by(email: email)
 
+      # Verifica bloqueio antes de qualquer tentativa de autenticação
+      if user&.locked?
+        AuditLogger.log_login(
+          user_id: user.id,
+          ip: context[:remote_ip],
+          user_agent: context[:user_agent],
+          success: false,
+          user: user,
+          failure_reason: 'account_locked'
+        )
+
+        minutes = user.lockout_remaining
+        return {
+          success: false,
+          message: "Conta bloqueada. Tente novamente em #{minutes} #{minutes == 1 ? 'minuto' : 'minutos'}.",
+          token: nil,
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::ACCOUNT_LOCKED, 'Conta temporariamente bloqueada')
+        }
+      end
+
       if user&.authenticate(password)
-        # Update last login timestamp
+        user.reset_failed_attempts!
         user.track_login!
 
-        # Generate JWT token
         token = JwtService.encode(
           user_id: user.id,
           role: user.primary_role
         )
 
-        # Log successful login
         AuditLogger.log_login(
           user_id: user.id,
           ip: context[:remote_ip],
@@ -66,8 +85,26 @@ module Mutations
           errors: []
         }
       else
-        # Log failed login attempt with specific reason
         failure_reason = user ? 'invalid_password' : 'user_not_found'
+
+        if user
+          just_locked = user.increment_failed_attempts!
+
+          if just_locked
+            AuditLogger.log(
+              action: 'account_locked',
+              resource: 'User',
+              resource_id: user.id,
+              user: user,
+              metadata: {
+                ip_address: context[:remote_ip],
+                user_agent: context[:user_agent],
+                failed_attempts: user.failed_login_attempts
+              },
+              result: 'blocked'
+            )
+          end
+        end
 
         AuditLogger.log_login(
           user_id: user&.id,
@@ -78,7 +115,6 @@ module Mutations
           failure_reason: failure_reason
         )
 
-        # Generic error message to prevent user enumeration
         {
           success: false,
           message: 'Invalid credentials',
