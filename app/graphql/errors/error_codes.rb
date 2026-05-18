@@ -5,6 +5,7 @@ module Errors
     INVALID_TOKEN = 'INVALID_TOKEN'.freeze
     TOKEN_EXPIRED = 'TOKEN_EXPIRED'.freeze
     INVALID_CREDENTIALS = 'INVALID_CREDENTIALS'.freeze
+    ACCOUNT_LOCKED = 'ACCOUNT_LOCKED'.freeze
 
     # Authorization Errors
     UNAUTHORIZED = 'UNAUTHORIZED'.freeze
