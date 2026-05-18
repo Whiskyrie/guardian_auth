@@ -15,6 +15,8 @@ class User < ApplicationRecord
   # Constants
   EMAIL_REGEX = /\A[a-zA-Z0-9][\w+\-.]*@[a-z\d-]+(\.[a-z\d-]+)*\.[a-z]+\z/i
   VERIFICATION_TOKEN_EXPIRY = 24.hours
+  MAX_FAILED_ATTEMPTS = 5
+  LOCKOUT_DURATION = 15.minutes
 
   # Strong password requirements: min 8 chars, at least one uppercase, lowercase, digit, and special char
   PASSWORD_REGEX = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}\z/
@@ -183,6 +185,29 @@ class User < ApplicationRecord
 
   def track_profile_update!
     update_column(:profile_updated_at, Time.current)
+  end
+
+  # Account lockout
+  def locked?
+    locked_until.present? && locked_until > Time.current
+  end
+
+  def increment_failed_attempts!
+    new_count = failed_login_attempts + 1
+    attrs = { failed_login_attempts: new_count }
+    attrs[:locked_until] = LOCKOUT_DURATION.from_now if new_count >= MAX_FAILED_ATTEMPTS
+    update_columns(attrs)
+    new_count >= MAX_FAILED_ATTEMPTS
+  end
+
+  def reset_failed_attempts!
+    update_columns(failed_login_attempts: 0, locked_until: nil)
+  end
+
+  def lockout_remaining
+    return 0 unless locked?
+
+    ((locked_until - Time.current) / 60).ceil
   end
 
   # Email verification
