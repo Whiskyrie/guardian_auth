@@ -38,6 +38,13 @@ Rails.application.configure do
   # Set localhost to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
 
+  # Configura entrega de email. Use Mailhog (localhost:1025) ou defina MAILER_DELIVERY_METHOD=test
+  config.action_mailer.delivery_method = ENV.fetch('MAILER_DELIVERY_METHOD', 'smtp').to_sym
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch('SMTP_HOST', 'localhost'),
+    port: ENV.fetch('SMTP_PORT', '1025').to_i
+  }
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
