@@ -25,6 +25,14 @@ module Resolvers
 
     private
 
+    def sanitize_search(term)
+      stripped = term.to_s.strip
+      return nil if stripped.length < 2 || stripped.length > 50
+
+      # Escapa wildcards do SQL LIKE para evitar full table scans intencionais
+      stripped.gsub(/[%_\\]/) { |c| "\\#{c}" }
+    end
+
     def apply_filters(scope, filters)
       # Filter by role using RBAC system
       if filters[:role].present?
@@ -32,11 +40,14 @@ module Resolvers
       end
 
       if filters[:search].present?
-        search_term = "%#{filters[:search]}%"
-        scope = scope.where(
-          "first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
-          search_term, search_term, search_term
-        )
+        sanitized = sanitize_search(filters[:search])
+        if sanitized
+          term = "%#{sanitized}%"
+          scope = scope.where(
+            "first_name ILIKE ? OR last_name ILIKE ? OR email ILIKE ?",
+            term, term, term
+          )
+        end
       end
 
       scope = scope.where("created_at >= ?", filters[:created_after]) if filters[:created_after].present?
