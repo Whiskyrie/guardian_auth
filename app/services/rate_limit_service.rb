@@ -1,111 +1,52 @@
 class RateLimitService
+  # Lua script: INCR atômico + EXPIRE apenas na primeira chamada + TTL em uma transação
+  INCR_WITH_EXPIRE = <<~LUA.freeze
+    local count = redis.call('INCR', KEYS[1])
+    if count == 1 then
+      redis.call('EXPIRE', KEYS[1], ARGV[1])
+    end
+    local ttl = redis.call('TTL', KEYS[1])
+    return {count, ttl}
+  LUA
+
   class << self
-    # Check if request should be rate limited
-    # @param operation [String] The mutation name (e.g., 'loginUser', 'registerUser')
-    # @param identifier [String] IP address or user ID
-    # @param limit [Integer] Maximum requests allowed
-    # @param window [ActiveSupport::Duration] Time window for the limit
-    # @return [Hash] { allowed: Boolean, remaining: Integer, reset_at: Time }
     def check_and_increment(operation:, identifier:, limit:, window:)
-      cache_key = build_cache_key(operation, identifier)
+      key = build_cache_key(operation, identifier)
+      window_seconds = window.to_i
 
-      # Get current data from cache
-      cache_data = Rails.cache.read(cache_key)
+      count, ttl = redis_eval(key, window_seconds)
 
-      if cache_data.nil?
-        # First request in window
-        cache_data = {
-          count: 1,
-          first_request_at: Time.current,
-          window_end: Time.current + window
-        }
+      reset_at = Time.current + [ttl, 0].max.seconds
+      allowed = count <= limit
 
-        Rails.cache.write(cache_key, cache_data, expires_in: window)
-
-        return {
-          allowed: true,
-          remaining: limit - 1,
-          reset_at: cache_data[:window_end],
-          limit: limit
-        }
-      end
-
-      # Check if we're still in the same window
-      if Time.current > cache_data[:window_end]
-        # Window expired, reset counter
-        cache_data = {
-          count: 1,
-          first_request_at: Time.current,
-          window_end: Time.current + window
-        }
-
-        Rails.cache.write(cache_key, cache_data, expires_in: window)
-
-        return {
-          allowed: true,
-          remaining: limit - 1,
-          reset_at: cache_data[:window_end],
-          limit: limit
-        }
-      end
-
-      # Check if limit would be exceeded with this request
-      if cache_data[:count] >= limit
-        # Log the blocked attempt
+      unless allowed
         Rails.logger.warn "Rate limit exceeded for #{operation} - Identifier: #{identifier}, " \
-                          "Count: #{cache_data[:count] + 1}/#{limit}"
-
-        return {
-          allowed: false,
-          remaining: 0,
-          reset_at: cache_data[:window_end],
-          limit: limit
-        }
+                          "Count: #{count}/#{limit}"
       end
 
-      # Increment counter and save (request is allowed)
-      cache_data[:count] += 1
-      Rails.cache.write(cache_key, cache_data, expires_in: time_until_reset(cache_data[:window_end]))
-
-      {
-        allowed: true,
-        remaining: [0, limit - cache_data[:count]].max,
-        reset_at: cache_data[:window_end],
-        limit: limit
-      }
+      { allowed: allowed, remaining: [0, limit - count].max, reset_at: reset_at, limit: limit }
+    rescue StandardError => e
+      Rails.logger.error "RateLimitService error: #{e.message}"
+      { allowed: true, remaining: limit, reset_at: Time.current + window, limit: limit }
     end
 
-    # Get current rate limit status without incrementing
-    # @param operation [String] The mutation name
-    # @param identifier [String] IP address or user ID
-    # @param limit [Integer] Maximum requests allowed
-    # @param window [ActiveSupport::Duration] Time window for the limit
-    # @return [Hash] { remaining: Integer, reset_at: Time, limit: Integer }
     def status(operation:, identifier:, limit:, window:)
-      cache_key = build_cache_key(operation, identifier)
-      cache_data = Rails.cache.read(cache_key)
+      key = build_cache_key(operation, identifier)
 
-      if cache_data.nil? || Time.current > cache_data[:window_end]
-        return {
-          remaining: limit,
-          reset_at: Time.current + window,
-          limit: limit
-        }
+      Rails.application.config.redis_pool.with do |redis|
+        count = redis.get(key).to_i
+        ttl = [redis.ttl(key), 0].max
+
+        { remaining: [0, limit - count].max, reset_at: Time.current + ttl.seconds, limit: limit }
       end
-
-      {
-        remaining: [0, limit - cache_data[:count]].max,
-        reset_at: cache_data[:window_end],
-        limit: limit
-      }
+    rescue StandardError => e
+      Rails.logger.error "RateLimitService#status error: #{e.message}"
+      { remaining: limit, reset_at: Time.current + window, limit: limit }
     end
 
-    # Clear rate limit for a specific operation and identifier
-    # @param operation [String] The mutation name
-    # @param identifier [String] IP address or user ID
     def clear(operation:, identifier:)
-      cache_key = build_cache_key(operation, identifier)
-      Rails.cache.delete(cache_key)
+      key = build_cache_key(operation, identifier)
+      Rails.application.config.redis_pool.with { |redis| redis.del(key) }
     end
 
     private
@@ -114,8 +55,11 @@ class RateLimitService
       "rate_limit:#{operation}:#{identifier}"
     end
 
-    def time_until_reset(reset_time)
-      [0, (reset_time - Time.current).to_i].max.seconds
+    def redis_eval(key, window_seconds)
+      Rails.application.config.redis_pool.with do |redis|
+        result = redis.eval(INCR_WITH_EXPIRE, keys: [key], argv: [window_seconds])
+        [result[0].to_i, result[1].to_i]
+      end
     end
   end
 end
