@@ -43,17 +43,11 @@ class SecurityHeadersMiddleware
   end
 
   def content_security_policy
+    # API-only: não serve HTML/JS/CSS — CSP minimalista sem unsafe-inline
     [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline'",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: https:",
-      "font-src 'self'",
-      "connect-src 'self'",
-      "frame-src 'none'",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'"
+      "default-src 'none'",
+      "frame-ancestors 'none'",
+      "base-uri 'none'"
     ].join('; ')
   end
 
