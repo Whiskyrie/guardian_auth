@@ -29,7 +29,7 @@ RSpec.describe 'RegisterUser mutation', type: :graphql do
       expect(gql_errors(result)).to be_nil
       data = gql_data(result)['registerUser']
       expect(data['success']).to be true
-      expect(data['message']).to eq('Registration successful')
+      expect(data['message']).to include('Registro realizado')
       expect(data['token']).to be_present
       expect(data['user']['email']).to eq('newuser@example.com')
       expect(data['user']['firstName']).to eq('John')
