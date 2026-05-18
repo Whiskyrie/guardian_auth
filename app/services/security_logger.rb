@@ -48,6 +48,26 @@ class SecurityLogger
     )
   end
 
+  def self.log_security_event(event:, ip:, user_agent:, details: {}, user_id: nil)
+    instance.log_security_event(
+      event: event,
+      user_id: user_id,
+      ip: ip,
+      user_agent: user_agent,
+      details: details
+    )
+  end
+
+  def self.log_authorization_failure(user_id:, ip:, user_agent:, resource:, reason:)
+    instance.log_authorization_failure(
+      user_id: user_id,
+      ip: ip,
+      user_agent: user_agent,
+      resource: resource,
+      reason: reason
+    )
+  end
+
   def log_login_attempt(ip:, user_agent:, success:, user_id: nil, failure_reason: nil)
     message = {
       event: 'login_attempt',
@@ -97,6 +117,33 @@ class SecurityLogger
       ip: ip,
       endpoint: endpoint,
       limit: limit,
+      timestamp: Time.current.iso8601
+    }
+
+    @logger.warn(message.to_json)
+  end
+
+  def log_security_event(event:, ip:, user_agent:, details: {}, user_id: nil)
+    message = {
+      event: event,
+      user_id: user_id,
+      ip: ip,
+      user_agent: user_agent,
+      details: details,
+      timestamp: Time.current.iso8601
+    }.compact
+
+    @logger.warn(message.to_json)
+  end
+
+  def log_authorization_failure(user_id:, ip:, user_agent:, resource:, reason:)
+    message = {
+      event: 'authorization_failure',
+      user_id: user_id,
+      ip: ip,
+      user_agent: user_agent,
+      resource: resource,
+      reason: reason,
       timestamp: Time.current.iso8601
     }
 
