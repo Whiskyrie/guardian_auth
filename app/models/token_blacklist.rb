@@ -21,9 +21,14 @@ class TokenBlacklist < ApplicationRecord
   end
 
   def self.cleanup_expired!
-    deleted_count = expired.delete_all
-    Rails.logger.info "Cleaned up #{deleted_count} expired tokens from blacklist"
-    deleted_count
+    total = 0
+    loop do
+      deleted = expired.limit(1000).delete_all
+      total += deleted
+      break if deleted < 1000
+    end
+    Rails.logger.info "Cleaned up #{total} expired tokens from blacklist"
+    total
   end
 
   # Instance methods
