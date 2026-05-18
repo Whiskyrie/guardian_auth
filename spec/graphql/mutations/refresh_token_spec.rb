@@ -106,11 +106,7 @@ RSpec.describe 'RefreshToken mutation', type: :graphql do
   describe 'token too old' do
     it 'returns error when token expired more than 7 days ago' do
       old_exp = 8.days.ago.to_i
-      old_token = JWT.encode(
-        { user_id: user.id, exp: old_exp, iat: 9.days.ago.to_i, jti: SecureRandom.uuid },
-        JwtService::SECRET_KEY,
-        JwtService::ALGORITHM
-      )
+      old_token = JwtService.encode({ user_id: user.id }, 9.days.ago)
 
       result = run_mutation(tok: old_token)
       data = gql_data(result)['refreshToken']

@@ -18,17 +18,11 @@ module Mutations
       # Step 1: Validate input
       return error_response('Token cannot be blank', code: Errors::ErrorCodes::INVALID_INPUT) if token.blank?
 
-      # Step 2: Decode token without verification to extract payload
-      # Using JwtService to avoid code duplication
-      decoded_payload = JwtService.decode_without_verification(token)
-      return error_response('Invalid token format') unless decoded_payload
+      # Step 2: Decode and verify signature (allows expired tokens)
+      decoded_payload = JwtService.decode_allowing_expired(token)
+      return error_response('Invalid token format or signature') unless decoded_payload
 
-      # Step 3: Verify token signature (but allow expired tokens)
-      # This ensures the token was actually issued by our system
-      verified_payload = JwtService.decode_allowing_expired(token)
-      return error_response('Invalid token: signature verification failed') unless verified_payload
-
-      # Step 4: Extract JTI and check blacklist BEFORE any further processing
+      # Step 3: Extract JTI and check blacklist BEFORE any further processing
       # SECURITY: This is critical - blacklisted tokens must not be usable for refresh
       jti = decoded_payload['jti']
       if jti && JwtService.blacklisted?(jti)

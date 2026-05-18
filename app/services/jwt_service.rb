@@ -100,6 +100,14 @@ class JwtService
   class << self
     private
 
+    def decode_without_verification(token)
+      body = JWT.decode(token, nil, false)[0]
+      HashWithIndifferentAccess.new(body)
+    rescue JWT::DecodeError => e
+      Rails.logger.warn "JWT decode without verification error: #{e.message}"
+      nil
+    end
+
     def secret_key
       @secret_key ||= Rails.application.credentials.secret_key_base ||
                       raise(ArgumentError, 'Missing secret_key_base in credentials')
