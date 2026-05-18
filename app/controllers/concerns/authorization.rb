@@ -22,13 +22,20 @@ module Authorization
     token = extract_token_from_header
     return nil unless token
 
-    decoded_token = JwtService.decode(token)
+    decoded_token = JwtService.decode_and_verify(token)
     return nil unless decoded_token
 
     user_id = decoded_token['user_id']
     return nil unless user_id
 
-    User.find_by(id: user_id)
+    user = User.find_by(id: user_id)
+    return nil unless user
+
+    if user.tokens_valid_after.present? && decoded_token['iat'].present?
+      return nil if Time.at(decoded_token['iat']) < user.tokens_valid_after
+    end
+
+    user
   rescue StandardError => e
     Rails.logger.warn "Authentication error: #{e.message}"
     nil
@@ -41,7 +48,6 @@ module Authorization
   def extract_token_from_header
     return nil unless authorization_header
 
-    # Expected format: "Bearer <token>"
     token_match = authorization_header.match(/^Bearer\s+(.+)$/i)
     token_match&.[](1)
   end
