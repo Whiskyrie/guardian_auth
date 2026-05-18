@@ -58,6 +58,9 @@ tmp/cache/
 *.swo
 *~
 
+# Ruby LSP
+.ruby-lsp/
+
 # OS files
 .DS_Store
 Thumbs.db
