@@ -10,6 +10,8 @@ module Types
     field :last_name, String, null: true, description: "Sobrenome do usuário"
     field :role, Types::UserRoleEnum, null: true, description: "Papel/função primário do usuário"
     field :roles, [Types::UserRoleEnum], null: true, description: "Lista de papéis/funções do usuário"
+    field :email_verified, Boolean, null: false,
+                                    description: "Indica se o endereço de email foi verificado"
     field :last_login_at, GraphQL::Types::ISO8601DateTime, null: true,
                                                            description: "Data e hora do último login do usuário"
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false,
@@ -22,6 +24,10 @@ module Types
                               description: "Nome completo do usuário (primeiro nome + sobrenome)"
     field :display_name, String, null: false,
                                  description: "Nome de exibição do usuário (nome completo se disponível, senão email)"
+
+    def email_verified
+      object.email_verified?
+    end
 
     def full_name
       object.full_name

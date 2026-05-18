@@ -18,6 +18,13 @@ module Types
     field :logout_all_devices, mutation: Mutations::LogoutAllDevices,
                                description: "Desconecta o usuário de todos os dispositivos"
 
+    # Email verification
+    field :verify_email, mutation: Mutations::VerifyEmail,
+                         description: "Verifica o email usando o token enviado por email"
+
+    field :resend_verification_email, mutation: Mutations::ResendVerificationEmail,
+                                      description: "Reenvia o email de verificação para o usuário autenticado"
+
     # Password management
     field :change_password, mutation: Mutations::ChangePassword,
                             description: "Altera a senha do usuário autenticado"

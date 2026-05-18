@@ -30,10 +30,11 @@ module Mutations
       )
 
       if user.save
+        SendVerificationEmailJob.perform_later(user.id)
         token = JwtService.encode(user_id: user.id)
         {
           success: true,
-          message: 'Registration successful',
+          message: 'Registro realizado. Verifique seu email para confirmar sua conta.',
           token: token,
           user: user,
           errors: []
