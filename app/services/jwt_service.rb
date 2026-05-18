@@ -1,16 +1,15 @@
 class JwtService
-  SECRET_KEY = Rails.application.credentials.secret_key_base || Rails.application.secret_key_base
   ALGORITHM = 'HS256'.freeze
 
   def self.encode(payload, exp = 24.hours.from_now)
     payload[:exp] = exp.to_i
     payload[:iat] = Time.current.to_i
     payload[:jti] = SecureRandom.uuid
-    JWT.encode(payload, SECRET_KEY, ALGORITHM)
+    JWT.encode(payload, secret_key, ALGORITHM)
   end
 
   def self.decode(token)
-    body = JWT.decode(token, SECRET_KEY, true, { algorithm: ALGORITHM })[0]
+    body = JWT.decode(token, secret_key, true, { algorithm: ALGORITHM })[0]
     HashWithIndifferentAccess.new(body)
   rescue JWT::ExpiredSignature
     Rails.logger.info 'JWT token has expired'
@@ -23,17 +22,8 @@ class JwtService
     nil
   end
 
-  def self.decode_without_verification(token)
-    body = JWT.decode(token, nil, false)[0]
-    HashWithIndifferentAccess.new(body)
-  rescue JWT::DecodeError => e
-    Rails.logger.warn "JWT decode without verification error: #{e.message}"
-    nil
-  end
-
   def self.decode_allowing_expired(token)
-    # Decode with signature verification but skip expiration check
-    body = JWT.decode(token, SECRET_KEY, true, {
+    body = JWT.decode(token, secret_key, true, {
                         algorithm: ALGORITHM,
                         verify_expiration: false,
                         verify_not_before: true,
@@ -50,8 +40,6 @@ class JwtService
     nil
   end
 
-  # Decodes once, verifies signature + expiry, checks blacklist.
-  # Returns the payload hash or nil if the token is invalid/revoked.
   def self.decode_and_verify(token)
     decoded = decode(token)
     return nil unless decoded
@@ -66,8 +54,6 @@ class JwtService
     decode_and_verify(token).present?
   end
 
-  # Check if a token is blacklisted (works with expired tokens too)
-  # Useful for refresh token validation where tokens may be expired
   def self.token_blacklisted?(token)
     decoded = decode_allowing_expired(token)
     return false unless decoded
@@ -97,14 +83,11 @@ class JwtService
       reason: reason
     )
   rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
-    # Token already blacklisted
     Rails.logger.info "Token #{jti} already blacklisted"
     true
   end
 
   def self.blacklist_user_tokens!(user_id, reason: 'password_change')
-    # For mass invalidation, we'll use a different approach
-    # Update user's tokens_valid_after timestamp
     user = User.find(user_id)
     user.update!(tokens_valid_after: Time.current)
   end
@@ -112,5 +95,14 @@ class JwtService
   def self.extract_jti_from_token(token)
     decoded = decode_allowing_expired(token)
     decoded&.dig('jti')
+  end
+
+  class << self
+    private
+
+    def secret_key
+      @secret_key ||= Rails.application.credentials.secret_key_base ||
+                      raise(ArgumentError, 'Missing secret_key_base in credentials')
+    end
   end
 end
