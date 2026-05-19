@@ -19,6 +19,14 @@ class UserPolicy < ApplicationPolicy
     admin? && !owner?
   end
 
+  def deactivate?
+    admin? && !owner?
+  end
+
+  def activate?
+    admin?
+  end
+
   def index?
     # Apenas admin pode listar todos os usuários
     admin?
