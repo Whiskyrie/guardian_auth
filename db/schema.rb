@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_19_000002) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_19_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,14 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_19_000002) do
     t.check_constraint "action IS NOT NULL", name: "audit_action_not_null"
     t.check_constraint "resource IS NOT NULL", name: "audit_resource_not_null"
     t.check_constraint "result::text = ANY (ARRAY['success'::character varying::text, 'failure'::character varying::text, 'blocked'::character varying::text])", name: "valid_audit_result"
+  end
+
+  create_table "password_histories", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "password_digest", null: false
+    t.datetime "created_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.index ["user_id", "created_at"], name: "index_password_histories_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_password_histories_on_user_id"
   end
 
   create_table "password_reset_tokens", force: :cascade do |t|
@@ -150,6 +158,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_19_000002) do
   end
 
   add_foreign_key "audit_logs", "users", on_delete: :nullify
+  add_foreign_key "password_histories", "users"
   add_foreign_key "password_reset_tokens", "users"
   add_foreign_key "role_permissions", "permissions"
   add_foreign_key "role_permissions", "roles"

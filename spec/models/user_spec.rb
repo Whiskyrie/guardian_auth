@@ -134,6 +134,44 @@ RSpec.describe User, type: :model do
       end
     end
 
+    describe 'password_not_previously_used' do
+      let(:user) { create(:user) }
+
+      it 'rejects the current password when changing' do
+        user.password = 'SecurePassword1@'
+        user.password_confirmation = 'SecurePassword1@'
+        expect(user).not_to be_valid
+        expect(user.errors[:password]).to include('was used recently. Please choose a different password.')
+      end
+
+      it 'rejects a password that is in history' do
+        # Archive 'SecurePassword1@' by changing to a new password
+        user.update!(password: 'NewPassword2@', password_confirmation: 'NewPassword2@')
+        # Now try to reuse the original password
+        user.password = 'SecurePassword1@'
+        user.password_confirmation = 'SecurePassword1@'
+        expect(user).not_to be_valid
+        expect(user.errors[:password]).to include('was used recently. Please choose a different password.')
+      end
+
+      it 'allows a password beyond the history limit' do
+        # 6 changes push 'SecurePassword1@' out of the 5-entry archive
+        passwords = %w[Password2@ Password3@ Password4@ Password5@ Password6@ Password7@]
+        passwords.each do |pw|
+          user.update!(password: pw, password_confirmation: pw)
+        end
+        user.password = 'SecurePassword1@'
+        user.password_confirmation = 'SecurePassword1@'
+        expect(user).to be_valid
+      end
+
+      it 'allows a brand new password' do
+        user.password = 'BrandNew99!'
+        user.password_confirmation = 'BrandNew99!'
+        expect(user).to be_valid
+      end
+    end
+
     describe 'password_not_similar_to_user_info' do
       it 'rejects password containing first name' do
         user = build(:user, first_name: 'Jonathan', password: 'Jonathan1@', password_confirmation: 'Jonathan1@')

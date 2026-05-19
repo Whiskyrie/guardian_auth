@@ -17,6 +17,7 @@ class User < ApplicationRecord
   VERIFICATION_TOKEN_EXPIRY = 24.hours
   MAX_FAILED_ATTEMPTS = 5
   LOCKOUT_DURATION = 15.minutes
+  PASSWORD_HISTORY_LIMIT = 5
 
   # Strong password requirements: min 8 chars, at least one uppercase, lowercase, digit, and special char
   PASSWORD_REGEX = /\A(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}\z/
@@ -40,6 +41,7 @@ class User < ApplicationRecord
 
   # Sessions
   has_many :sessions, dependent: :destroy
+  has_many :password_histories, -> { order(created_at: :desc) }, dependent: :destroy, inverse_of: :user
 
   # Validations
   validates :email,
@@ -73,13 +75,15 @@ class User < ApplicationRecord
               message: 'must contain only letters, spaces, hyphens, and apostrophes'
             }
 
-  # Custom validation for password strength
+  # Custom validations for password strength and history
   validate :password_not_similar_to_user_info, if: -> { password.present? }
+  validate :password_not_previously_used, if: -> { password.present? && password_digest_changed? }
 
   # Callbacks
   before_validation :normalize_email, on: %i[create update]
   after_create :assign_default_role
   before_save :sanitize_user_inputs
+  after_save :archive_password_digest, if: :saved_change_to_password_digest?
 
   # Scopes
   # Legacy scopes - converted to use RBAC
@@ -345,6 +349,32 @@ class User < ApplicationRecord
     sanitized = sanitized.gsub(/[<>]/, '')
 
     sanitized
+  end
+
+  def password_not_previously_used
+    # Check against the currently stored password (before new hash was computed)
+    prior_digest = new_record? ? nil : password_digest_was
+    if prior_digest.present? && BCrypt::Password.new(prior_digest).is_password?(password)
+      errors.add(:password, 'was used recently. Please choose a different password.')
+      return
+    end
+
+    password_histories.limit(PASSWORD_HISTORY_LIMIT).each do |history|
+      if BCrypt::Password.new(history.password_digest).is_password?(password)
+        errors.add(:password, 'was used recently. Please choose a different password.')
+        return
+      end
+    end
+  end
+
+  def archive_password_digest
+    old_digest = password_digest_before_last_save
+    return unless old_digest.present?
+
+    password_histories.create!(password_digest: old_digest)
+
+    excess_ids = password_histories.offset(PASSWORD_HISTORY_LIMIT).ids
+    password_histories.where(id: excess_ids).delete_all if excess_ids.any?
   end
 
   def password_not_similar_to_user_info

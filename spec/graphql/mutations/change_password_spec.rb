@@ -81,6 +81,28 @@ RSpec.describe 'ChangePassword mutation', type: :graphql do
     end
   end
 
+  describe 'password history enforcement' do
+    it 'rejects reuse of the current password' do
+      result = run_mutation(new_password: 'SecurePassword1@')
+
+      data = gql_data(result)['changePassword']
+      expect(data['success']).to be false
+      expect(data['errors'].first['code']).to eq('VALIDATION_FAILED')
+      expect(data['errors'].first['message']).to include('was used recently')
+    end
+
+    it 'rejects a password that was used recently' do
+      run_mutation(new_password: 'NewSecure1@')
+      # Try to reuse the original password
+      result = run_mutation(current_password: 'NewSecure1@', new_password: 'SecurePassword1@')
+
+      data = gql_data(result)['changePassword']
+      expect(data['success']).to be false
+      expect(data['errors'].first['code']).to eq('VALIDATION_FAILED')
+      expect(data['errors'].first['message']).to include('was used recently')
+    end
+  end
+
   describe 'unauthenticated user' do
     it 'raises an authentication error when no user is provided' do
       result = execute_graphql(

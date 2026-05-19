@@ -98,6 +98,33 @@ RSpec.describe 'ResetPassword mutation', type: :graphql do
     end
   end
 
+  describe 'password history enforcement' do
+    it 'rejects reuse of the current password' do
+      raw_token = generate_reset_token(for_user: user)
+      result = run_mutation(token: raw_token, new_password: 'SecurePassword1@')
+
+      data = gql_data(result)['resetPassword']
+      expect(data['success']).to be false
+      expect(data['errors'].first['code']).to eq('VALIDATION_FAILED')
+      expect(data['errors'].first['message']).to include('was used recently')
+    end
+
+    it 'rejects a password that was previously used' do
+      # First reset: change away from the original password
+      first_token = generate_reset_token(for_user: user)
+      run_mutation(token: first_token, new_password: 'Intermediate1@')
+
+      # Second reset: try to reuse the original password
+      second_token = generate_reset_token(for_user: user)
+      result = run_mutation(token: second_token, new_password: 'SecurePassword1@')
+
+      data = gql_data(result)['resetPassword']
+      expect(data['success']).to be false
+      expect(data['errors'].first['code']).to eq('VALIDATION_FAILED')
+      expect(data['errors'].first['message']).to include('was used recently')
+    end
+  end
+
   describe 'successful reset invalidates existing sessions' do
     it 'updates tokens_valid_after on the user' do
       raw_token = generate_reset_token(for_user: user)
