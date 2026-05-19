@@ -17,12 +17,10 @@ module Mutations
         return { success: false, message: "No token found", errors: auth_error(Errors::ErrorCodes::INVALID_TOKEN, 'No token found') }
       end
 
-      # Blacklist the current token
-      JwtService.blacklist_token!(
-        current_token,
-        current_user.id,
-        reason: 'logout'
-      )
+      # Blacklist the current token and mark Session as revoked
+      JwtService.blacklist_token!(current_token, current_user.id, reason: 'logout')
+      jti = JwtService.extract_jti_from_token(current_token)
+      Session.find_by(jti: jti)&.update_columns(revoked_at: Time.current, revoked_reason: 'logout')
 
       {
         success: true,

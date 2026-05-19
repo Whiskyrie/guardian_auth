@@ -20,11 +20,9 @@ module Mutations
         return { success: false, message: "Invalid password", errors: auth_error(Errors::ErrorCodes::INVALID_CREDENTIALS, 'Invalid password') }
       end
 
-      # Invalidate all tokens for this user
-      JwtService.blacklist_user_tokens!(
-        current_user.id,
-        reason: 'admin_logout'
-      )
+      # Invalidate all tokens for this user and mark all active sessions as revoked
+      JwtService.blacklist_user_tokens!(current_user.id, reason: 'admin_logout')
+      current_user.sessions.active.update_all(revoked_at: Time.current, revoked_reason: 'logout_all_devices')
 
       {
         success: true,
