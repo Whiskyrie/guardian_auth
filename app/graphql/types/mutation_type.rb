@@ -57,5 +57,8 @@ module Types
 
     field :activate_user, mutation: Mutations::ActivateUser,
                           description: "Reativa a conta de um usuário desativado (apenas administradores)"
+
+    field :revoke_session, mutation: Mutations::RevokeSession,
+                           description: "Revoga uma sessão específica do usuário"
   end
 end
