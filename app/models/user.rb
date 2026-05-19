@@ -34,6 +34,10 @@ class User < ApplicationRecord
   has_many :granted_roles, class_name: 'UserRole', foreign_key: 'granted_by_id', dependent: :nullify
   has_many :password_reset_tokens, dependent: :destroy
 
+  # Deactivation
+  belongs_to :deactivated_by, class_name: 'User', optional: true
+  has_many :deactivated_users, class_name: 'User', foreign_key: 'deactivated_by_id', dependent: :nullify, inverse_of: :deactivated_by
+
   # Validations
   validates :email,
             presence: true,
@@ -79,8 +83,10 @@ class User < ApplicationRecord
   scope :admins, -> { joins(:roles).where(roles: { name: 'admin' }) }
   scope :users, -> { joins(:roles).where(roles: { name: 'user' }) }
   scope :recent, -> { order(created_at: :desc) }
-  scope :active, -> { where.not(last_login_at: nil) }
+  scope :active, -> { where.not(last_login_at: nil) } # "has ever logged in" — unrelated to deactivation
   scope :inactive, -> { where(last_login_at: nil) }
+  scope :deactivated, -> { where.not(deactivated_at: nil) }
+  scope :not_deactivated, -> { where(deactivated_at: nil) }
 
   # Role helper methods (maintaining compatibility)
   def admin?
@@ -252,8 +258,30 @@ class User < ApplicationRecord
   end
 
   def deactivated?
-    # Placeholder for future deactivation feature
-    false
+    deactivated_at.present?
+  end
+
+  def deactivate!(by:, reason: nil)
+    return false if deactivated?
+
+    update_columns(
+      deactivated_at: Time.current,
+      deactivated_by_id: by&.id,
+      deactivation_reason: reason,
+      tokens_valid_after: Time.current
+    )
+    true
+  end
+
+  def activate!
+    return false unless deactivated?
+
+    update_columns(
+      deactivated_at: nil,
+      deactivated_by_id: nil,
+      deactivation_reason: nil
+    )
+    true
   end
 
   # Class methods
