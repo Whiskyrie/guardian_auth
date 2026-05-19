@@ -36,6 +36,13 @@ module Types
       context[:current_user]
     end
 
+    # Session queries
+    field :my_sessions, resolver: Resolvers::MySessionsResolver,
+                        description: 'Lista as sessões ativas do usuário autenticado'
+
+    field :user_sessions, resolver: Resolvers::UserSessionsResolver,
+                          description: 'Lista sessões ativas de um usuário (apenas administradores)'
+
     # Admin-only queries
     field :users, resolver: Resolvers::UsersResolver,
                   max_page_size: 50,        # Limita este campo específico
