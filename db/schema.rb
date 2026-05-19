@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_19_000001) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_19_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -79,6 +79,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_19_000001) do
     t.index ["name"], name: "index_roles_on_name", unique: true
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "jti", null: false
+    t.inet "ip_address"
+    t.string "user_agent", limit: 512
+    t.datetime "expires_at", null: false
+    t.datetime "revoked_at"
+    t.string "revoked_reason"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["expires_at"], name: "index_sessions_on_expires_at"
+    t.index ["jti"], name: "index_sessions_on_jti", unique: true
+    t.index ["revoked_at"], name: "index_sessions_active", where: "(revoked_at IS NULL)"
+    t.index ["user_id", "revoked_at"], name: "index_sessions_on_user_id_and_revoked_at"
+    t.index ["user_id"], name: "index_sessions_on_user_id"
+  end
+
   create_table "token_blacklists", force: :cascade do |t|
     t.string "jti", null: false
     t.datetime "expires_at", null: false
@@ -136,6 +153,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_19_000001) do
   add_foreign_key "password_reset_tokens", "users"
   add_foreign_key "role_permissions", "permissions"
   add_foreign_key "role_permissions", "roles"
+  add_foreign_key "sessions", "users"
   add_foreign_key "token_blacklists", "users"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
