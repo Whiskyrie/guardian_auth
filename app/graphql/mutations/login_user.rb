@@ -60,6 +60,25 @@ module Mutations
         }
       end
 
+      if user&.deactivated?
+        AuditLogger.log_login(
+          user_id: user.id,
+          ip: context[:remote_ip],
+          user_agent: context[:user_agent],
+          success: false,
+          user: user,
+          failure_reason: 'account_deactivated'
+        )
+
+        return {
+          success: false,
+          message: 'Conta desativada. Entre em contato com o administrador.',
+          token: nil,
+          user: nil,
+          errors: auth_error(Errors::ErrorCodes::ACCOUNT_DEACTIVATED, 'Account is deactivated')
+        }
+      end
+
       if user&.authenticate(password)
         user.reset_failed_attempts!
         user.track_login!
