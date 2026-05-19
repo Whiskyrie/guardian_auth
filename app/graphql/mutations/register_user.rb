@@ -31,7 +31,7 @@ module Mutations
 
       if user.save
         SendVerificationEmailJob.perform_later(user.id)
-        token = JwtService.encode(user_id: user.id)
+        token, = Session.issue!(user: user, ip: context[:remote_ip], user_agent: context[:user_agent])
         {
           success: true,
           message: 'Registro realizado. Verifique seu email para confirmar sua conta.',
