@@ -1,11 +1,18 @@
 class JwtService
   ALGORITHM = 'HS256'.freeze
 
-  def self.encode(payload, exp = 24.hours.from_now)
+  IssuedToken = Struct.new(:token, :jti, :expires_at, keyword_init: true)
+
+  def self.issue(payload, exp: 24.hours.from_now)
     payload[:exp] = exp.to_i
     payload[:iat] = Time.current.to_i
     payload[:jti] = SecureRandom.uuid
-    JWT.encode(payload, secret_key, ALGORITHM)
+    token = JWT.encode(payload, secret_key, ALGORITHM)
+    IssuedToken.new(token: token, jti: payload[:jti], expires_at: Time.at(payload[:exp]))
+  end
+
+  def self.encode(payload, exp = 24.hours.from_now)
+    issue(payload, exp: exp).token
   end
 
   def self.decode(token)
