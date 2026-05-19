@@ -34,6 +34,17 @@ RSpec.describe 'LogoutAllDevices mutation', type: :graphql do
     it 'updates tokens_valid_after to invalidate all existing tokens' do
       expect { run_mutation }.to change { user.reload.tokens_valid_after }
     end
+
+    it 'marks all active sessions as revoked' do
+      s1 = create(:session, user: user)
+      s2 = create(:session, user: user)
+
+      run_mutation
+
+      expect(s1.reload.revoked?).to be true
+      expect(s2.reload.revoked?).to be true
+      expect(s1.revoked_reason).to eq('logout_all_devices')
+    end
   end
 
   describe 'wrong password' do

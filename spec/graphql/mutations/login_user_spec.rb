@@ -86,6 +86,21 @@ RSpec.describe 'LoginUser mutation', type: :graphql do
     end
   end
 
+  describe 'session creation on successful login' do
+    let(:user) { create(:user) }
+
+    it 'creates a Session record on successful login' do
+      expect {
+        execute_graphql(query: mutation, variables: { email: user.email, password: 'SecurePassword1@' })
+      }.to change(Session, :count).by(1)
+    end
+
+    it 'associates the session with the logged-in user' do
+      execute_graphql(query: mutation, variables: { email: user.email, password: 'SecurePassword1@' })
+      expect(Session.last.user).to eq(user)
+    end
+  end
+
   describe 'deactivated account' do
     let(:deactivated_user) { create(:user, deactivated_at: Time.current) }
 

@@ -39,6 +39,14 @@ RSpec.describe 'LogoutUser mutation', type: :graphql do
 
       expect(JwtService.blacklisted?(jti)).to be true
     end
+
+    it 'marks the corresponding Session as revoked' do
+      token, session = Session.issue!(user: user, ip: '127.0.0.1', user_agent: 'RSpec')
+      execute_graphql(query: mutation, user: user, token: token)
+
+      expect(session.reload.revoked?).to be true
+      expect(session.revoked_reason).to eq('logout')
+    end
   end
 
   describe 'unauthenticated user' do
