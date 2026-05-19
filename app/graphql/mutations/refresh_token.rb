@@ -66,6 +66,7 @@ module Mutations
       if jti
         begin
           JwtService.blacklist_token!(token, user.id, reason: 'token_refresh')
+          Session.find_by(jti: jti)&.update_columns(revoked_at: Time.current, revoked_reason: 'token_refresh')
           Rails.logger.info "RefreshToken: Blacklisted used token jti=#{jti} for user_id=#{user.id}"
         rescue StandardError => e
           # Log but don't fail - the blacklist check above already verified it wasn't blacklisted
@@ -73,8 +74,8 @@ module Mutations
         end
       end
 
-      # Step 9: Generate new token
-      new_token = JwtService.encode(user_id: user.id, role: user.primary_role)
+      # Step 9: Generate new token and persist session
+      new_token, = Session.issue!(user: user, ip: context[:remote_ip], user_agent: context[:user_agent])
       return error_response('Failed to generate new token', code: Errors::ErrorCodes::INTERNAL_ERROR) unless new_token
 
       # Update last login timestamp
