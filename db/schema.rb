@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_05_18_083659) do
+ActiveRecord::Schema[8.0].define(version: 2026_05_19_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -119,7 +119,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_18_083659) do
     t.datetime "email_verification_sent_at"
     t.integer "failed_login_attempts", default: 0, null: false
     t.datetime "locked_until"
+    t.datetime "deactivated_at"
+    t.bigint "deactivated_by_id"
+    t.string "deactivation_reason"
     t.index ["created_at"], name: "index_users_on_created_at"
+    t.index ["deactivated_at"], name: "index_users_on_deactivated_at_partial", where: "(deactivated_at IS NOT NULL)"
+    t.index ["deactivated_by_id"], name: "index_users_on_deactivated_by_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_verification_digest"], name: "index_users_on_email_verification_digest", unique: true, where: "(email_verification_digest IS NOT NULL)"
     t.index ["last_login_at"], name: "index_users_on_last_login_at"
@@ -135,4 +140,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_05_18_083659) do
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
   add_foreign_key "user_roles", "users", column: "granted_by_id"
+  add_foreign_key "users", "users", column: "deactivated_by_id", name: "fk_users_deactivated_by", on_delete: :nullify
 end
