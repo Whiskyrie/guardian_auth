@@ -38,6 +38,9 @@ class User < ApplicationRecord
   belongs_to :deactivated_by, class_name: 'User', optional: true
   has_many :deactivated_users, class_name: 'User', foreign_key: 'deactivated_by_id', dependent: :nullify, inverse_of: :deactivated_by
 
+  # Sessions
+  has_many :sessions, dependent: :destroy
+
   # Validations
   validates :email,
             presence: true,
