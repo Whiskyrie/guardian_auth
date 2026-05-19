@@ -85,4 +85,30 @@ RSpec.describe 'LoginUser mutation', type: :graphql do
       expect(data['errors'].first['code']).to eq('INVALID_INPUT')
     end
   end
+
+  describe 'deactivated account' do
+    let(:deactivated_user) { create(:user, deactivated_at: Time.current) }
+
+    it 'blocks login and returns ACCOUNT_DEACTIVATED' do
+      result = execute_graphql(
+        query: mutation,
+        variables: { email: deactivated_user.email, password: 'SecurePassword1@' }
+      )
+      data = gql_data(result)['loginUser']
+
+      expect(data['success']).to be false
+      expect(data['token']).to be_nil
+      expect(data['errors'].first['code']).to eq('ACCOUNT_DEACTIVATED')
+    end
+
+    it 'does not expose the user object on deactivated login' do
+      result = execute_graphql(
+        query: mutation,
+        variables: { email: deactivated_user.email, password: 'SecurePassword1@' }
+      )
+      data = gql_data(result)['loginUser']
+
+      expect(data['user']).to be_nil
+    end
+  end
 end

@@ -307,6 +307,114 @@ RSpec.describe User, type: :model do
     end
   end
 
+  # ---- Deactivation ----
+
+  describe '#deactivated?' do
+    it 'returns false when deactivated_at is nil' do
+      user = create(:user)
+      expect(user.deactivated?).to be false
+    end
+
+    it 'returns true when deactivated_at is set' do
+      user = create(:user, deactivated_at: Time.current)
+      expect(user.deactivated?).to be true
+    end
+  end
+
+  describe '#active?' do
+    it 'returns true for a persisted, non-deactivated user' do
+      user = create(:user)
+      expect(user.active?).to be true
+    end
+
+    it 'returns false for a deactivated user' do
+      user = create(:user, deactivated_at: Time.current)
+      expect(user.active?).to be false
+    end
+  end
+
+  describe '#deactivate!' do
+    let(:admin) { create(:user, :admin) }
+
+    it 'sets deactivated_at, deactivated_by_id, and deactivation_reason' do
+      user = create(:user)
+      user.deactivate!(by: admin, reason: 'Policy violation')
+
+      user.reload
+      expect(user.deactivated_at).to be_present
+      expect(user.deactivated_by_id).to eq(admin.id)
+      expect(user.deactivation_reason).to eq('Policy violation')
+    end
+
+    it 'bumps tokens_valid_after to invalidate existing sessions' do
+      user = create(:user)
+      before_time = Time.current
+      user.deactivate!(by: admin)
+
+      expect(user.reload.tokens_valid_after).to be >= before_time
+    end
+
+    it 'returns true when deactivation succeeds' do
+      user = create(:user)
+      expect(user.deactivate!(by: admin)).to be true
+    end
+
+    it 'returns false and does nothing when user is already deactivated' do
+      user = create(:user, deactivated_at: 1.day.ago)
+      original_time = user.deactivated_at
+
+      result = user.deactivate!(by: admin)
+
+      expect(result).to be false
+      expect(user.reload.deactivated_at).to be_within(1.second).of(original_time)
+    end
+  end
+
+  describe '#activate!' do
+    it 'clears deactivated_at, deactivated_by_id, and deactivation_reason' do
+      admin = create(:user, :admin)
+      user = create(:user, deactivated_at: 1.day.ago, deactivated_by_id: admin.id, deactivation_reason: 'test')
+      user.activate!
+
+      user.reload
+      expect(user.deactivated_at).to be_nil
+      expect(user.deactivated_by_id).to be_nil
+      expect(user.deactivation_reason).to be_nil
+    end
+
+    it 'returns true when activation succeeds' do
+      user = create(:user, deactivated_at: Time.current)
+      expect(user.activate!).to be true
+    end
+
+    it 'returns false when user is already active' do
+      user = create(:user)
+      expect(user.activate!).to be false
+    end
+  end
+
+  describe 'scopes' do
+    describe '.deactivated' do
+      it 'returns only deactivated users' do
+        active_user = create(:user)
+        deactivated_user = create(:user, deactivated_at: Time.current)
+
+        expect(User.deactivated).to include(deactivated_user)
+        expect(User.deactivated).not_to include(active_user)
+      end
+    end
+
+    describe '.not_deactivated' do
+      it 'returns only active (non-deactivated) users' do
+        active_user = create(:user)
+        deactivated_user = create(:user, deactivated_at: Time.current)
+
+        expect(User.not_deactivated).to include(active_user)
+        expect(User.not_deactivated).not_to include(deactivated_user)
+      end
+    end
+  end
+
   # ---- Class Methods ----
 
   describe '.find_by_email' do
