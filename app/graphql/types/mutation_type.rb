@@ -51,5 +51,11 @@ module Types
 
     field :update_user_role, mutation: Mutations::UpdateUserRole,
                              description: "Atualiza o papel/função de um usuário (apenas administradores)"
+
+    field :deactivate_user, mutation: Mutations::DeactivateUser,
+                            description: "Desativa a conta de um usuário (apenas administradores)"
+
+    field :activate_user, mutation: Mutations::ActivateUser,
+                          description: "Reativa a conta de um usuário desativado (apenas administradores)"
   end
 end

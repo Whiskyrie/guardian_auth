@@ -19,11 +19,21 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false,
                                                         description: "Data e hora da última atualização dos dados"
 
+    # Status fields
+    field :active, Boolean, null: false,
+                            description: "Indica se a conta do usuário está ativa (não desativada)"
+    field :deactivated_at, GraphQL::Types::ISO8601DateTime, null: true,
+                                                            description: "Data e hora em que a conta foi desativada (nil se ativa)"
+
     # Helper fields
     field :full_name, String, null: true,
                               description: "Nome completo do usuário (primeiro nome + sobrenome)"
     field :display_name, String, null: false,
                                  description: "Nome de exibição do usuário (nome completo se disponível, senão email)"
+
+    def active
+      object.active?
+    end
 
     def email_verified
       object.email_verified?
