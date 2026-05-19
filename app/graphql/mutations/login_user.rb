@@ -83,9 +83,10 @@ module Mutations
         user.reset_failed_attempts!
         user.track_login!
 
-        token = JwtService.encode(
-          user_id: user.id,
-          role: user.primary_role
+        token, = Session.issue!(
+          user: user,
+          ip: context[:remote_ip],
+          user_agent: context[:user_agent]
         )
 
         AuditLogger.log_login(
